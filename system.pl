@@ -2,15 +2,10 @@
 %                 NATURAL NATURAL DEDUCTION THEOREM PROVER                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % by Flip Lijnzaad %
-%   version 0.4    %
+%   version 0.5    %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% TODO: possibly add more information to the predicate?
-%       that will be necessary anyways upon introduction of subproofs.
-% TODO: somehow keep track of the line numbers: maybe use a list to keep track
-%       of all previous proof steps (see email Malvin)
-% TODO: interesting: querying provable(N, or(p, r), Justification) gives
-%       a stack overflow (:
-% TODO: add citation step numbers to the predicate
+
+% TODO: conjElim goes into infinite recursion: how to make it stop?
 % TODO: add the list of all previous lines to the predicate
 % TODO: add a cut to the rule bodies but justify it theoretically
 
@@ -34,8 +29,33 @@
 %       * two(x, y) if two steps x, y need to be cited
 %       * sub(x, y) if a subproof x - y needs to be cited
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+:- p.
+:- q.
+% :- and(p, q).
 
-% The premises need to be asserted into the database
+from(and(X, Y)) :-
+    asserta(X),
+    asserta(Y).
+
+from(not(not(X))) :-
+    asserta(X).
+
+to(or(X, _)) :-
+    X.
+
+to(and(X, Y)) :-
+    X, Y.
+
+% prove(N, X, conjElim, Old) :-
+%     from(X).
+
+prove(N, X, conjIntro, Old) :-
+    to(X).
+
+prove(_, not(not(X)), negElim, _) :-
+    from(X).
+
+% The premises need to be asserted into the database by the user
 :- dynamic provable/4.
 provable(1, and(p, q), premise, 0).
 % The conclusion needs to be queried by the user like so:
