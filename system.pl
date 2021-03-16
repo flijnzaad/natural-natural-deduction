@@ -2,15 +2,18 @@
 %                 NATURAL NATURAL DEDUCTION THEOREM PROVER                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % by Flip Lijnzaad %
-%   version 0.5    %
+%   version 0.6    %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % TODO: conjElim goes into infinite recursion: how to make it stop?
 % TODO: add the list of all previous lines to the predicate
 % TODO: add a cut to the rule bodies but justify it theoretically
+% TODO: needs better line number support: more flexibility
+% TODO: how to get rid of lines that turned out to be unnecessary in the proof?
+%       will that be a problem at all?
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% The provable/3 predicate has the following arguments:
+% The provable/4 predicate has the following arguments:
 % 1) the line number of the proof;
 % 2) the formula in question, which is built up from the following:
 %       * atomic constants p, q, r ...;
@@ -29,31 +32,6 @@
 %       * two(x, y) if two steps x, y need to be cited
 %       * sub(x, y) if a subproof x - y needs to be cited
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-:- p.
-:- q.
-% :- and(p, q).
-
-from(and(X, Y)) :-
-    asserta(X),
-    asserta(Y).
-
-from(not(not(X))) :-
-    asserta(X).
-
-to(or(X, _)) :-
-    X.
-
-to(and(X, Y)) :-
-    X, Y.
-
-% prove(N, X, conjElim, Old) :-
-%     from(X).
-
-prove(N, X, conjIntro, Old) :-
-    to(X).
-
-prove(_, not(not(X)), negElim, _) :-
-    from(X).
 
 % The premises need to be asserted into the database by the user
 :- dynamic provable/4.
@@ -65,15 +43,16 @@ provable(1, and(p, q), premise, 0).
 % that contains a conjunction with X as its first conjunct"
 % provable(Current, X, conjElim, [H|T]) :-
 provable(Current, X, conjElim, Previous) :-
+    X \= and(_, _),
     Current > 0,
     Previous is Current - 1,
     Previous > 0,
     % H = provable(Previous, and(X, _), _),
-    provable(Previous, and(X, Y), _, _), !, nonvar(Y), !.
+    provable(Previous, and(X, Y), _, _), nonvar(Y), !.
 
 % commutativity of and: and(X, Y) <=> and(Y, X)
 provable(Current, X, conjElim, Previous) :-
-    % Current > Previous,
+    X \= and(_, _),
     Current > 0,
     Previous is Current - 1,
     Previous > 0,
@@ -137,3 +116,23 @@ derive(_, X, _) :-
     derive(Current, and(X, Y), conjIntro), !.
 
 % problem here: a Prolog rule can only have one predicate as its rule head
+
+provableFrom(line(New, X, conjElim)) :- 
+    Old is New - 1,
+    line(Old, and(X, _), _).
+
+provableFrom(line(New, X, conjElim)) :- 
+    Old is New - 1,
+    line(Old, and(_, X), _).
+
+provableFrom(line(New, or(X, _), disjIntro)) :-
+    Old is New - 1,
+    line(Old, X, _).
+
+provFrom(line(X, conjElim), line(and(X, _), _)).
+
+provFrom(line(or(X, _), disjIntro), line(X, _)).
+
+provFrom(X, Z) :-
+    provFrom(X, Y),
+    provFrom(Y, Z).
