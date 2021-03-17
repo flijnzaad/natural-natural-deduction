@@ -2,15 +2,17 @@
 %                 NATURAL NATURAL DEDUCTION THEOREM PROVER                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % by Flip Lijnzaad %
-%   version 0.6    %
+%   version 0.7    %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % TODO: conjElim goes into infinite recursion: how to make it stop?
 % TODO: add the list of all previous lines to the predicate
+% TODO: forward and backward search
 % TODO: add a cut to the rule bodies but justify it theoretically
 % TODO: needs better line number support: more flexibility
 % TODO: how to get rid of lines that turned out to be unnecessary in the proof?
 %       will that be a problem at all?
+% TODO: support for con- and disjunctions with more than 2 con-/disjuncts
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % The provable/4 predicate has the following arguments:
@@ -18,7 +20,7 @@
 % 2) the formula in question, which is built up from the following:
 %       * atomic constants p, q, r ...;
 %       * special propositional atom 'contra' for contradiction (\bot);
-%       * unary operator:   not(_);
+%       * unary operator:   neg(_);         (not/1 is already predefined)
 %       * binary operators: and(_, _),
 %                           or(_, _),
 %                           imp(_, _),
@@ -95,27 +97,8 @@ provable(Current, and(X, Y), conjIntro, two(Previous1, Previous2)) :-
     provable(Previous1, X, _, _),
     provable(Previous2, Y, _, _).
 
-% turning the predicate around
-:- dynamic derive/3.
-% conclusion
-derive(_, and(p, q), _).
-% query the premises
-
-derive(Previous, and(X, _), _) :-
-    Current is Previous + 1,
-    derive(Current, X, conjElim), !.
-
-% same problem as with provable: this rule can go on forever
-derive(Previous, X, _) :-
-    Current is Previous + 1,
-    derive(Current, or(X, _), disjIntro), !.
-
-derive(_, X, _) :-
-    derive(Previous2, Y, _),
-    Current is Previous2 + 1,
-    derive(Current, and(X, Y), conjIntro), !.
-
-% problem here: a Prolog rule can only have one predicate as its rule head
+% problems of provableFrom/1:
+%   * same as provable: infinite recursion because of uninstantiated variables
 
 provableFrom(line(New, X, conjElim)) :- 
     Old is New - 1,
@@ -129,9 +112,24 @@ provableFrom(line(New, or(X, _), disjIntro)) :-
     Old is New - 1,
     line(Old, X, _).
 
-provFrom(line(X, conjElim), line(and(X, _), _)).
+% problems of provFrom/2:
+%   * no line number support
+%   * no support for more than one premise
 
-provFrom(line(or(X, _), disjIntro), line(X, _)).
+provFrom(line(X, conjElim), line(and(X, Y), _)) :-
+    nonvar(Y).
+
+provFrom(line(X, conjElim), line(and(Y, X), _)) :-
+    nonvar(Y).
+
+provFrom(line(or(X, Y), disjIntro), line(X, _)) :-
+    nonvar(Y).
+
+provFrom(line(or(Y, X), disjIntro), line(X, _)) :-
+    nonvar(Y).
+
+% TODO: this rule causes infinite recursion: why, and how to solve?
+% provFrom(line(X, negElim), line(neg(neg(X)), _)).
 
 provFrom(X, Z) :-
     provFrom(X, Y),
