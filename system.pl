@@ -2,10 +2,9 @@
 %                 NATURAL NATURAL DEDUCTION THEOREM PROVER                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % by Flip Lijnzaad %
-%   version 0.8    %
+%   version 0.9    %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% TODO: conjElim goes into infinite recursion: how to make it stop?
 % TODO: add the list of all previous lines to the predicate
 % TODO: forward and backward search
 % TODO: add a cut to the rule bodies but justify it theoretically
@@ -23,10 +22,10 @@
 %       * unary operator:   neg(_);         (not/1 is already predefined)
 %       * binary operators: and(_, _),
 %                           or(_, _),
-%                           imp(_, _),
-%                           biimp(_, _);
+%                           if(_, _),
+%                           iff(_, _);
 % 3) the justification for that formula, with choice from:
-%       * [conj|disj|neg|imp|biimp][Intro|Elim]
+%       * [conj|disj|neg|imp|biimp|contra][Intro|Elim]
 %       * premise
 % 4) the line numbers that need to be cited:
 %       * 0 if the line is a premise (of a subproof)
@@ -97,48 +96,44 @@ provable(Current, and(X, Y), conjIntro, two(Previous1, Previous2)) :-
     provable(Previous1, X, _, _),
     provable(Previous2, Y, _, _).
 
-% problems of provableFrom/1:
-%   * same as provable: infinite recursion because of uninstantiated variables
-
-provableFrom(line(New, X, conjElim)) :- 
-    Old is New - 1,
-    line(Old, and(X, _), _).
-
-provableFrom(line(New, X, conjElim)) :- 
-    Old is New - 1,
-    line(Old, and(_, X), _).
-
-provableFrom(line(New, or(X, _), disjIntro)) :-
-    Old is New - 1,
-    line(Old, X, _).
-
 % problems of provFrom/2:
 %   * no line number support
 %   * no support for more than one premise
 
+% provFrom(conclusion, premise) where each step is line(formula, justification)
+
+% conjunction elimination: prove X from and(X, Y)
 provFrom(line(X, conjElim), line(and(X, Y), _)) :-
     nonvar(Y),
     write(X),
     write(' by conjElim'), nl.
 
+% conjunction elimination: prove X from and(Y, X) (commutativity)
 provFrom(line(X, conjElim), line(and(Y, X), _)) :-
     nonvar(Y),
     write(X),
     write(' by conjElim'), nl.
 
+% disjunction introduction: prove or(X, Y) from X
 provFrom(line(or(X, Y), disjIntro), line(X, _)) :-
     nonvar(Y),
     write(X),
     write(' by disjIntro'), nl.
 
+% disjunction introduction: prove or(Y, X) from X (commutativity)
 provFrom(line(or(Y, X), disjIntro), line(X, _)) :-
     nonvar(Y),
     write(X),
     write(' by disjIntro'), nl.
 
 % TODO: this rule sometimes causes infinite recursion: why, and how to solve?
+%       it seems that it only gets into infinite recursion if the query does
+%       so anyway; if you remove this rule, then it will end up in infinite
+%       recursion in the transitive rule anyways.
 provFrom(line(X, negElim), line(neg(neg(X)), _)).
 
+% transitivity: X is provable from Z if X is provable from Y and Y is provable
+% from Z
 provFrom(X, Z) :-
     provFrom(X, Y),
     provFrom(Y, Z),
