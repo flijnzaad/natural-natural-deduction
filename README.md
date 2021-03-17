@@ -39,4 +39,4 @@ This system uses [SWI Prolog](https://www.swi-prolog.org/download/stable) versio
 
 * If the system gets stuck in infinite recursion, you can stop it with `Ctrl-C`. Then type `a`, for `[a]bort`.
 
-* If your query returns `true` without a full stop at the end, there are still alternative branches of the search tree to be explored. Press `;` to explore another branch, press `.` to terminate the search there.
+* If your query returns `true` without a full stop at the end, there are still alternative branches of the search tree to be explored. Press `;` to explore another branch, press `.` or `<Enter>` to terminate the search there.
