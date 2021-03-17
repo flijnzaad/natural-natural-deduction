@@ -2,7 +2,7 @@
 %                 NATURAL NATURAL DEDUCTION THEOREM PROVER                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % by Flip Lijnzaad %
-%   version 0.7    %
+%   version 0.8    %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % TODO: conjElim goes into infinite recursion: how to make it stop?
@@ -117,20 +117,29 @@ provableFrom(line(New, or(X, _), disjIntro)) :-
 %   * no support for more than one premise
 
 provFrom(line(X, conjElim), line(and(X, Y), _)) :-
-    nonvar(Y).
+    nonvar(Y),
+    write(X),
+    write(' by conjElim'), nl.
 
 provFrom(line(X, conjElim), line(and(Y, X), _)) :-
-    nonvar(Y).
+    nonvar(Y),
+    write(X),
+    write(' by conjElim'), nl.
 
 provFrom(line(or(X, Y), disjIntro), line(X, _)) :-
-    nonvar(Y).
+    nonvar(Y),
+    write(X),
+    write(' by disjIntro'), nl.
 
 provFrom(line(or(Y, X), disjIntro), line(X, _)) :-
-    nonvar(Y).
+    nonvar(Y),
+    write(X),
+    write(' by disjIntro'), nl.
 
-% TODO: this rule causes infinite recursion: why, and how to solve?
-% provFrom(line(X, negElim), line(neg(neg(X)), _)).
+% TODO: this rule sometimes causes infinite recursion: why, and how to solve?
+provFrom(line(X, negElim), line(neg(neg(X)), _)).
 
 provFrom(X, Z) :-
     provFrom(X, Y),
-    provFrom(Y, Z).
+    provFrom(Y, Z),
+    writeln(Z).
