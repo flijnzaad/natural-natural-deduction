@@ -115,17 +115,20 @@ proves(Premises, LineX) :-
     LineX = line(X, JustX),
     LineY = line(Y, JustY),
     proves(Premises, LineY),
-    printline(Y, JustY),
+    printline(LineY),
     \+ member(LineY, Premises),
     proves([LineY|Premises], LineX),
-    printline(X, JustX).
+    printline(LineX).
 
 % reiteration / stop when goal reached:
 proves(Premises, Line) :-
     Line = line(X, reit),
     member(line(X, _), Premises).
 
-printline(Formula, Justification) :-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+printline(Line) :-
+    Line = line(Formula, Justification),
     open('proofs.txt', append, Stream),
     write(Stream, Formula),
     nl(Stream), tab(Stream, 24),
@@ -137,8 +140,7 @@ provesWrap(Premises, Conclusion, []) :-
     proves(Premises, Conclusion).
 
 provesWrap(Premises, Conclusion, [H|T]) :-
-    H = line(F, J),
-    printline(F, J),
+    printline(H),
     provesWrap(Premises, Conclusion, T).
 
 q1 :-
