@@ -10,13 +10,14 @@ This system uses [SWI Prolog](https://www.swi-prolog.org/download/stable) versio
 
       $ prolog system.pl
 
-* You can also start up your Prolog interpreter and load the system there, like so:
+* You can also start up your Prolog interpreter and load the system there using `make/0`, like so:
 
       $ prolog
 
-      ?- [system].
+      ?- make.
 
-    * This way of loading the knowledge base (`[filename].`) is also useful if you have made changes to the system and want to reload the knowledge base without restarting the interpreter.
+    * `make/0` consults all source files that have been changed since they were consulted.
+    * This way of loading the knowledge base is also useful if you have made changes to the system and want to reload the knowledge base without restarting the interpreter.
 
 * The Prolog interpreter can be stopped like so:
 
@@ -34,8 +35,6 @@ This system uses [SWI Prolog](https://www.swi-prolog.org/download/stable) versio
 * You can exit `trace` mode like so:
 
       [trace]  ? - nodebug.
-
-* It's a good idea to exit `trace` mode before reloading the system with `[system].` since reloading with the trace on takes a lot of steps.
 
 * If the system gets stuck in infinite recursion, you can stop it with `Ctrl-C`. Then type `a`, for `[a]bort`.
 
