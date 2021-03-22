@@ -2,16 +2,14 @@
 %                 NATURAL NATURAL DEDUCTION THEOREM PROVER                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % by Flip Lijnzaad %
-%   version 0.10   %
+%   version 0.11   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % TODO: add the list of all previous lines to the predicate
 % TODO: forward and backward search
 % TODO: add a cut to the rule bodies but justify it theoretically
-% TODO: needs better line number support: more flexibility
 % TODO: how to get rid of lines that turned out to be unnecessary in the proof?
 %       will that be a problem at all?
-% TODO: support for con- and disjunctions with more than 2 con-/disjuncts
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % The provable/4 predicate has the following arguments:
@@ -27,6 +25,7 @@
 % 3) the justification for that formula, with choice from:
 %       * [conj|disj|neg|imp|biimp|contra][Intro|Elim]
 %       * premise
+%       * reit
 % 4) the line numbers that need to be cited:
 %       * 0 if the line is a premise (of a subproof)
 %       * just the number if only 1 citation
@@ -79,28 +78,37 @@ provFrom(X, Z) :-
 
 % proves(X, Y) where X is a list of previous proof lines and Y is a formula
 % that can be proven from X
+% line(X, Y) where X is the formula on the line, Y is the justification
 
 % conjunction elimination:
-proves(Premises,X) :-
-    member(and(X,_), Premises).
+proves(Premises, line(X, conjElim)) :-
+    member(line(and(X,_), _), Premises).
+
 proves(Premises,Y) :-
-    member(and(_,Y), Premises).
+    member(line(and(_,Y), _), Premises).
 
 % conjunction introduction:
-proves(Premises,and(X,Y)) :-
-    member(X,Premises), member(Y,Premises).
+proves(Premises, line(and(X,Y), conjIntro)) :-
+    member(line(X, _), Premises),
+    member(line(Y, _), Premises).
 
 % disjunction introduction:
-proves(Premises, or(X, _)) :-
-    member(X, Premises).
-proves(Premises, or(_, X)) :-
-    member(X, Premises).
+proves(Premises, line(or(X, _), disjIntro)) :-
+    member(line(X, _), Premises).
+
+proves(Premises, line(or(_, X), disjIntro)) :-
+    member(line(X, _), Premises).
+
+% implication elimination:
+proves(Premises, line(Y, impElim)) :-
+    member(line(if(X, Y), _), Premises),
+    member(line(X, _), Premises).
 
 % transitivity: => recursion
-proves(Premises,X) :-
-    proves(Premises,Y),
-    \+ member(Y,Premises),
-    proves([Y|Premises], X).
+proves(Premises, line(X, JustX)) :-
+    proves(Premises, line(Y, JustY)),
+    \+ member(line(Y, JustY), Premises),
+    proves([line(Y, JustY)|Premises], line(X, JustX)).
 
 % reiteration / stop when goal reached:
-proves(Premises,X) :- member(X,Premises).
+proves(Premises, line(X, reit)) :- member(line(X, _),Premises).
