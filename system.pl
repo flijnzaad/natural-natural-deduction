@@ -2,7 +2,7 @@
 %                 NATURAL NATURAL DEDUCTION THEOREM PROVER                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % by Flip Lijnzaad %
-%   version 0.9    %
+%   version 0.10   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % TODO: add the list of all previous lines to the predicate
@@ -33,68 +33,6 @@
 %       * two(x, y) if two steps x, y need to be cited
 %       * sub(x, y) if a subproof x - y needs to be cited
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% The premises need to be asserted into the database by the user
-:- dynamic provable/4.
-provable(1, and(p, q), premise, 0).
-% The conclusion needs to be queried by the user like so:
-% provable(LineNr, Conclusion, Justification, _).
-
-% "X is provable by conjunction elimination if there is a previous line 
-% that contains a conjunction with X as its first conjunct"
-% provable(Current, X, conjElim, [H|T]) :-
-provable(Current, X, conjElim, Previous) :-
-    X \= and(_, _),
-    Current > 0,
-    Previous is Current - 1,
-    Previous > 0,
-    % H = provable(Previous, and(X, _), _),
-    provable(Previous, and(X, Y), _, _), nonvar(Y), !.
-
-% commutativity of and: and(X, Y) <=> and(Y, X)
-provable(Current, X, conjElim, Previous) :-
-    X \= and(_, _),
-    Current > 0,
-    Previous is Current - 1,
-    Previous > 0,
-    provable(Previous, and(Y, X), _, _), nonvar(Y), !.
-
-% "A disjunction with X as its left disjunct is provable by 
-% disjunction introduction if there is a previous line that contains X"
-provable(Current, or(X, _), disjIntro, Previous) :-
-    % Current > Previous,
-    Current > 0,
-    Previous is Current -1,
-    Previous > 0,
-    provable(Previous, X, _, _), !.
-
-% commutativity of or: or(X, Y) <=> or(Y, X)
-provable(Current, or(_, X), disjIntro, Previous) :-
-    % Current > Previous,
-    Current > 0,
-    Previous is Current - 1,
-    Previous > 0,
-    provable(Previous, X, _, _), !.
-
-% "X is provable by negation elimination if there is a previous line
-% that contains the twice negated version of X"
-provable(Current, X, negElim, Previous) :-
-    % Current > Previous,
-    Current > 0,
-    Previous is Current - 1,
-    Previous > 0,
-    provable(Previous, not(not(X)), _, _), !.
-
-% "A conjunction of X and Y is provable by conjunction introduction 
-% if there is a previous line that contains the first conjunct and
-% a previous line that contains the second conjunct"
-provable(Current, and(X, Y), conjIntro, two(Previous1, Previous2)) :-
-    Previous1 is Current - 2,
-    Previous2 is Current - 1,
-    % Current > Previous1,
-    % Current > Previous2,
-    provable(Previous1, X, _, _),
-    provable(Previous2, Y, _, _).
 
 % problems of provFrom/2:
 %   * no line number support
@@ -138,3 +76,31 @@ provFrom(X, Z) :-
     provFrom(X, Y),
     provFrom(Y, Z),
     writeln(Z).
+
+% proves(X, Y) where X is a list of previous proof lines and Y is a formula
+% that can be proven from X
+
+% conjunction elimination:
+proves(Premises,X) :-
+    member(and(X,_), Premises).
+proves(Premises,Y) :-
+    member(and(_,Y), Premises).
+
+% conjunction introduction:
+proves(Premises,and(X,Y)) :-
+    member(X,Premises), member(Y,Premises).
+
+% disjunction introduction:
+proves(Premises, or(X, _)) :-
+    member(X, Premises).
+proves(Premises, or(_, X)) :-
+    member(X, Premises).
+
+% transitivity: => recursion
+proves(Premises,X) :-
+    proves(Premises,Y),
+    \+ member(Y,Premises),
+    proves([Y|Premises], X).
+
+% reiteration / stop when goal reached:
+proves(Premises,X) :- member(X,Premises).
