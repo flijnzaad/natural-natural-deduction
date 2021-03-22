@@ -126,10 +126,12 @@ proves(Premises, Line) :-
     member(line(X, _), Premises).
 
 printline(Formula, Justification) :-
-    write(Formula),
-    nl, tab(24),
-    write(Justification),
-    nl.
+    open('proofs.txt', append, Stream),
+    write(Stream, Formula),
+    nl(Stream), tab(Stream, 24),
+    write(Stream, Justification),
+    nl(Stream),
+    close(Stream).
 
 provesWrap(Premises, Conclusion, []) :-
     proves(Premises, Conclusion).
