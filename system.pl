@@ -2,7 +2,7 @@
 %                 NATURAL NATURAL DEDUCTION THEOREM PROVER                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % by Flip Lijnzaad %
-%   version 0.11   %
+%   version 0.12   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % TODO: add the list of all previous lines to the predicate
@@ -81,34 +81,44 @@ provFrom(X, Z) :-
 % line(X, Y) where X is the formula on the line, Y is the justification
 
 % conjunction elimination:
-proves(Premises, line(X, conjElim)) :-
+proves(Premises, Line) :-
+    Line = line(X, conjElim),
     member(line(and(X,_), _), Premises).
 
-proves(Premises,Y) :-
+proves(Premises, Line) :-
+    Line = line(Y, conjElim),
     member(line(and(_,Y), _), Premises).
 
 % conjunction introduction:
-proves(Premises, line(and(X,Y), conjIntro)) :-
+proves(Premises, Line) :-
+    Line = line(and(X,Y), conjIntro),
     member(line(X, _), Premises),
     member(line(Y, _), Premises).
 
 % disjunction introduction:
-proves(Premises, line(or(X, _), disjIntro)) :-
+proves(Premises, Line) :-
+    Line = line(or(X, _), disjIntro),
     member(line(X, _), Premises).
 
-proves(Premises, line(or(_, X), disjIntro)) :-
+proves(Premises, Line) :-
+    Line = line(or(_, X), disjIntro),
     member(line(X, _), Premises).
 
 % implication elimination:
-proves(Premises, line(Y, impElim)) :-
+proves(Premises, Line) :-
+    Line = line(Y, impElim),
     member(line(if(X, Y), _), Premises),
     member(line(X, _), Premises).
 
 % transitivity: => recursion
-proves(Premises, line(X, JustX)) :-
-    proves(Premises, line(Y, JustY)),
-    \+ member(line(Y, JustY), Premises),
-    proves([line(Y, JustY)|Premises], line(X, JustX)).
+proves(Premises, LineX) :-
+    LineX = line(X, JustX),
+    LineY = line(Y, JustY),
+    proves(Premises, LineY),
+    \+ member(LineY, Premises),
+    proves([LineY|Premises], LineX).
 
 % reiteration / stop when goal reached:
-proves(Premises, line(X, reit)) :- member(line(X, _),Premises).
+proves(Premises, Line) :-
+    Line = line(X, reit),
+    member(line(X, _), Premises).
