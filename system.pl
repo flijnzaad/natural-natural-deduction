@@ -2,7 +2,7 @@
 %                 NATURAL NATURAL DEDUCTION THEOREM PROVER                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % by Flip Lijnzaad %
-%   version 0.12   %
+%   version 0.13   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % TODO: add the list of all previous lines to the predicate
@@ -115,10 +115,36 @@ proves(Premises, LineX) :-
     LineX = line(X, JustX),
     LineY = line(Y, JustY),
     proves(Premises, LineY),
+    printline(Y, JustY),
     \+ member(LineY, Premises),
-    proves([LineY|Premises], LineX).
+    proves([LineY|Premises], LineX),
+    printline(X, JustX).
 
 % reiteration / stop when goal reached:
 proves(Premises, Line) :-
     Line = line(X, reit),
     member(line(X, _), Premises).
+
+printline(Formula, Justification) :-
+    write(Formula),
+    nl, tab(24),
+    write(Justification),
+    nl.
+
+provesWrap(Premises, Conclusion, []) :-
+    proves(Premises, Conclusion).
+
+provesWrap(Premises, Conclusion, [H|T]) :-
+    H = line(F, J),
+    printline(F, J),
+    provesWrap(Premises, Conclusion, T).
+
+q1 :-
+    Premises = [line(and(p, q), premise)], 
+    Concl = line(or(p,q), _), 
+    provesWrap(Premises, Concl, Premises).
+
+q2 :-
+    Premises = [line(and(p, q), premise), line(if(p, r), premise)], 
+    Concl = line(r, _), 
+    provesWrap(Premises, Concl, Premises).
