@@ -2,7 +2,7 @@
 %                 NATURAL NATURAL DEDUCTION THEOREM PROVER                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % by Flip Lijnzaad %
-%   version 0.13   %
+%   version 0.14   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % TODO: add the list of all previous lines to the predicate
@@ -110,13 +110,35 @@ proves(Premises, Line) :-
     member(line(if(X, Y), _), Premises),
     member(line(X, _), Premises).
 
+% bi-implication elimination:
+proves(Premises, Line) :-
+    Line = line(Y, biimpElim),
+    member(line(iff(X, Y), _), Premises),
+    member(line(X, _), Premises).
+
+proves(Premises, Line) :-
+    Line = line(X, biimpElim),
+    member(line(iff(X, Y), _), Premises),
+    member(line(Y, _), Premises).
+
+% negation elimination:
+proves(Premises, Line) :-
+    Line = line(X, negElim),
+    member(line(neg(neg(X)), _), Premises).
+
+% contradiction introduction:
+proves(Premises, Line) :-
+    Line = line(contra, contraIntro),
+    member(line(X, _), Premises),
+    member(line(neg(X), _), Premises).
+
 % transitivity: => recursion
 proves(Premises, LineX) :-
     LineX = line(X, JustX),
     LineY = line(Y, JustY),
     proves(Premises, LineY),
     printline(LineY),
-    \+ member(LineY, Premises),
+    \+ member(line(Y, _), Premises),     % don't prove lines you already have
     proves([LineY|Premises], LineX),
     printline(LineX).
 
@@ -124,6 +146,11 @@ proves(Premises, LineX) :-
 proves(Premises, Line) :-
     Line = line(X, reit),
     member(line(X, _), Premises).
+
+% contradiction elimination:
+proves(Premises, Line) :-
+    Line = line(_, contraElim),
+    member(line(contra, _), Premises).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -151,4 +178,9 @@ q1 :-
 q2 :-
     Premises = [line(and(p, q), premise), line(if(p, r), premise)], 
     Concl = line(r, _), 
+    provesWrap(Premises, Concl, Premises).
+
+q3 :-
+    Premises = [line(p, premise), line(q, premise), line(r, premise)],
+    Concl = line(and(and(p, q), r), _),
     provesWrap(Premises, Concl, Premises).
