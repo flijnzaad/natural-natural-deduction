@@ -10,16 +10,14 @@ This system uses [SWI Prolog](https://www.swi-prolog.org/download/stable) versio
 
       $ prolog system.pl
 
-* You can also start up your Prolog interpreter and load the system there using `make/0`, like so:
-
-      $ prolog
+* Within the Prolog interpreter, you can (re)load the system using `make/0`:
 
       ?- make.
 
     * `make/0` consults all source files that have been changed since they were consulted.
-    * This way of loading the knowledge base is also useful if you have made changes to the system and want to reload the knowledge base without restarting the interpreter.
+    * If you started the interpreter without arguments (i.e. just `prolog`), you first need to load the knowledge base using `[system].` before you can use `make.`.
 
-* The Prolog interpreter can be stopped like so:
+* The Prolog interpreter can be stopped with <kbd>Ctrl</kbd> + <kbd>D</kbd>, or by typing:
 
       ?- halt.
 
@@ -29,13 +27,13 @@ This system uses [SWI Prolog](https://www.swi-prolog.org/download/stable) versio
 
       ?- trace.
 
-    * You will then be able to walk through the steps of the system with each `<Enter>` press.
-    * To abort the query in the `trace` mode, type `a` for `[a]bort`.
+    * You will then be able to walk through the steps of the system with each <kbd>Enter</kbd> press.
+    * To abort the query in the `trace` mode, type <kbd>a</kbd> for `[a]bort`.
 
 * You can exit `trace` mode like so:
 
       [trace]  ? - nodebug.
 
-* If the system gets stuck in infinite recursion, you can stop it with `Ctrl-C`. Then type `a`, for `[a]bort`.
+* If the system gets stuck in infinite recursion, you can stop it with <kbd>Ctrl</kbd> + <kbd>C</kbd>. Then type <kbd>a</kbd>, for `[a]bort`.
 
-* If your query returns `true` without a full stop at the end, there are still alternative branches of the search tree to be explored. Press `;` to explore another branch, press `.` or `<Enter>` to terminate the search there.
+* If your query returns `true` without a full stop at the end, there are still alternative branches of the search tree to be explored. Press <kbd>;</kbd> to explore another branch, press <kbd>.</kbd> or <kbd>Enter</kbd> to terminate the search there.
