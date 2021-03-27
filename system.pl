@@ -2,7 +2,7 @@
 %                 NATURAL NATURAL DEDUCTION THEOREM PROVER                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % by Flip Lijnzaad %
-%   version 0.14   %
+%   version 0.15   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % TODO: add the list of all previous lines to the predicate
@@ -10,71 +10,12 @@
 % TODO: add a cut to the rule bodies but justify it theoretically
 % TODO: how to get rid of lines that turned out to be unnecessary in the proof?
 %       will that be a problem at all?
+% TODO: add line number support
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% The provable/4 predicate has the following arguments:
-% 1) the line number of the proof;
-% 2) the formula in question, which is built up from the following:
-%       * atomic constants p, q, r ...;
-%       * special propositional atom 'contra' for contradiction (\bot);
-%       * unary operator:   neg(_);         (not/1 is already predefined)
-%       * binary operators: and(_, _),
-%                           or(_, _),
-%                           if(_, _),
-%                           iff(_, _);
-% 3) the justification for that formula, with choice from:
-%       * [conj|disj|neg|imp|biimp|contra][Intro|Elim]
-%       * premise
-%       * reit
-% 4) the line numbers that need to be cited:
-%       * 0 if the line is a premise (of a subproof)
-%       * just the number if only 1 citation
-%       * two(x, y) if two steps x, y need to be cited
-%       * sub(x, y) if a subproof x - y needs to be cited
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% problems of provFrom/2:
-%   * no line number support
-%   * no support for more than one premise
-
-% provFrom(conclusion, premise) where each step is line(formula, justification)
-
-% conjunction elimination: prove X from and(X, Y)
-provFrom(line(X, conjElim), line(and(X, Y), _)) :-
-    nonvar(Y),
-    write(X),
-    write(' by conjElim'), nl.
-
-% conjunction elimination: prove X from and(Y, X) (commutativity)
-provFrom(line(X, conjElim), line(and(Y, X), _)) :-
-    nonvar(Y),
-    write(X),
-    write(' by conjElim'), nl.
-
-% disjunction introduction: prove or(X, Y) from X
-provFrom(line(or(X, Y), disjIntro), line(X, _)) :-
-    nonvar(Y),
-    write(X),
-    write(' by disjIntro'), nl.
-
-% disjunction introduction: prove or(Y, X) from X (commutativity)
-provFrom(line(or(Y, X), disjIntro), line(X, _)) :-
-    nonvar(Y),
-    write(X),
-    write(' by disjIntro'), nl.
-
-% TODO: this rule sometimes causes infinite recursion: why, and how to solve?
-%       it seems that it only gets into infinite recursion if the query does
-%       so anyway; if you remove this rule, then it will end up in infinite
-%       recursion in the transitive rule anyways.
-provFrom(line(X, negElim), line(neg(neg(X)), _)).
-
-% transitivity: X is provable from Z if X is provable from Y and Y is provable
-% from Z
-provFrom(X, Z) :-
-    provFrom(X, Y),
-    provFrom(Y, Z),
-    writeln(Z).
+% Current problems:
+%     * some of the lines in premises have uninstantiated variables in them
+%     * q4 always goes into infinite recursion, no matter the bound: why?
+%     * try to make some more complex queries to check the infinite recursion
 
 % proves(X, Y) where X is a list of previous proof lines and Y is a formula
 % that can be proven from X
@@ -134,13 +75,15 @@ proves(Premises, Line) :-
 
 % transitivity: => recursion
 proves(Premises, LineX) :-
+    length(Premises, N),
+    N < 2,                               % bound the number of proof steps
     LineX = line(X, JustX),
     LineY = line(Y, JustY),
     proves(Premises, LineY),
-    printline(LineY),
     \+ member(line(Y, _), Premises),     % don't prove lines you already have
+    printline(Premises, LineY),
     proves([LineY|Premises], LineX),
-    printline(LineX).
+    printline(Premises, LineX).
 
 % reiteration / stop when goal reached:
 proves(Premises, Line) :-
@@ -154,9 +97,12 @@ proves(Premises, Line) :-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-printline(Line) :-
+printline(Premises, Line) :-
     Line = line(Formula, Justification),
     open('proofs.txt', append, Stream),
+    length(Premises, N),
+    M is N + 1,
+    write(Stream, M), tab(Stream, 2),
     write(Stream, Formula),
     nl(Stream), tab(Stream, 24),
     write(Stream, Justification),
@@ -167,7 +113,7 @@ provesWrap(Premises, Conclusion, []) :-
     proves(Premises, Conclusion).
 
 provesWrap(Premises, Conclusion, [H|T]) :-
-    printline(H),
+    printline(Premises, H),
     provesWrap(Premises, Conclusion, T).
 
 q1 :-
@@ -184,3 +130,9 @@ q3 :-
     Premises = [line(p, premise), line(q, premise), line(r, premise)],
     Concl = line(and(and(p, q), r), _),
     provesWrap(Premises, Concl, Premises).
+
+q4 :-
+    Premises = [line(and(p, q), premise)],
+    Concl = line(and(and(q, and(p, p)), or(r, p)), _),
+    provesWrap(Premises, Concl, Premises).
+
