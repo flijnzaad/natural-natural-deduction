@@ -37,3 +37,24 @@ This system uses [SWI Prolog](https://www.swi-prolog.org/download/stable) versio
 * If the system gets stuck in infinite recursion, you can stop it with <kbd>Ctrl</kbd> + <kbd>C</kbd>. Then type <kbd>a</kbd>, for `[a]bort`.
 
 * If your query returns `true` without a full stop at the end, there are still alternative branches of the search tree to be explored. Press <kbd>;</kbd> to explore another branch, press <kbd>.</kbd> or <kbd>Enter</kbd> to terminate the search there.
+
+## Predicates and functions of the knowledge base
+
+* Propositional logic formulas are built up from the following:
+  * atomic constants `p`, `q`, `r`, ...;
+  * special propositional atom `contra` for contradiction;
+  * unary operator: `neg(_)` (`not/1` is already defined in Prolog)
+  * binary operators: 
+    * `and(_, _)` for conjunction
+    * `or(_, _)` for disjunction
+    * `if(_, _)` for implication
+    * `iff(_, _)` for bi-implication
+* Justifications are as follows:
+  * `[conj|disj|neg|imp|biimp|contra][Intro|Elim]` for the introduction and elimination rules
+  * `premise` if the line is a premise
+  * `reit` if the line is a reiteration
+* Citing line numbers (experimental/for the future):
+  * `0` if the line is a premise (of a subproof)
+  * just the number if only 1 citation
+  * `two(x, y)` if two steps `x`, `y` need to be cited
+  * `sub(x, y)` if a subproof `x - y` needs to be cited
