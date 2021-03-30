@@ -74,9 +74,9 @@ proves(Premises, line(X, JustX), All) :-
     New = [line(Y, JustY)|Premises],
     proves(New, line(X, JustX), All), !,
     printline(N, line(Y, JustY)),
-    printline(N, line(X, JustX)).
-    % All = [line(X, JustX)|New].
-    % reverse(Newer, All).
+    printline(N, line(X, JustX)),
+    Newer = [line(X, JustX)|New],
+    reverse(Newer, All).
     % writeln(All).
 
 % reiteration / stop when goal reached:
