@@ -2,7 +2,7 @@
 %                 NATURAL NATURAL DEDUCTION THEOREM PROVER                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % by Flip Lijnzaad %
-%   version 0.18   %
+%   version 0.19   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % TODO: add the list of all previous lines to the predicate
@@ -12,14 +12,10 @@
 %       will that be a problem at all?
 % TODO: add line number support
 
-% FIXME: q3-7 always go into infinite recursion, no matter the bound: why?
-%        --> only when the reverse/2 at the end is included; else only q4.
-%        when reverse/2 is included, the conclusion and all needed proof lines
-%        are in proofs.txt, but the program never exits recursion.
 % FIXME: q4 always goes into infinite recursion: or(p, p) is never introduced,
 %        only "higher-level" disjunctions are present
 
-% proves(X, Y) where X is a list of previous proof lines and Y is a formula
+% proves(X, Y) where X is a list of previous proof lines, Y is a formula
 % that can be proven from X
 % line(X, Y) where X is the formula on the line, Y is the justification
 
@@ -66,22 +62,29 @@ proves(Premises, line(contra, contraIntro), _, _) :-
     member(line(neg(X), _), Premises).
 
 % transitivity: => recursion
+% All contains all lines of the proof until now, 
+% End should eventually return the full proof
 proves(Premises, line(X, JustX), AllOld, End) :-
+    % bound the number of proof steps
     length(Premises, N),
-    N < 4,                               % bound the number of proof steps
-    proves(Premises, line(Y, JustY), AllOld, End),
+    N < 3,
+    % this derives 1 step from the premises, matching the simple rules
+    proves(Premises, line(Y, JustY), AllOld, _),
     write('AllOld: '), writeln(AllOld),
-    \+ member(line(Y, _), Premises),     % don't prove lines you already have
+    % don't prove lines you already have
+    \+ member(line(Y, _), Premises),
     New = [line(Y, JustY)|Premises],
     append(AllOld, [line(Y, JustY)], AllNew),
     write('AllNew: '), writeln(AllNew),
-    proves(New, line(X, JustX), AllNew, End), !,
+    % this either matches with simple rules or goes into transitivity
+    proves(New, line(X, JustX), AllNew, _), !,
     append(AllNew, [line(X, JustX)], All),
     write('All: '), writeln(All),
     printline(N, line(Y, JustY)),
     printline(N, line(X, JustX)),
-    write('End: '), writeln(End),
-    End = All.
+    End = All,
+    write('Premises: '), writeln(Premises),
+    assertz(done(End)).
 
 % reiteration / stop when goal reached:
 proves(Premises, line(X, reit), _, _) :-
