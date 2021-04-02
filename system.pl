@@ -68,15 +68,17 @@ proves(Premises, line(contra, contraIntro), _) :-
 % transitivity: => recursion
 proves(Premises, line(X, JustX), All) :-
     length(Premises, N),
-    N < 8,                               % bound the number of proof steps
-    proves(Premises, line(Y, JustY), All),
+    N < 5,                               % bound the number of proof steps
+    proves(Premises, line(Y, JustY), AllOld),
     \+ member(line(Y, _), Premises),     % don't prove lines you already have
     New = [line(Y, JustY)|Premises],
-    proves(New, line(X, JustX), All), !,
+    append(AllOld, [line(Y, JustY)], AllNew),
+    proves(New, line(X, JustX), AllNew), !,
+    append(AllNew, [line(X, JustX)], All),
     printline(N, line(Y, JustY)),
-    printline(N, line(X, JustX)),
-    Newer = [line(X, JustX)|New],
-    reverse(Newer, All).
+    printline(N, line(X, JustX)).
+    % All = [line(X, JustX)|New].
+    % reverse(Newer, All).
     % writeln(All).
 
 % reiteration / stop when goal reached:
@@ -99,6 +101,8 @@ printline(N, Line) :-
     nl(Stream),
     close(Stream).
 
+% provesWrap/4 takes care of printing the premises
+% and then calls proves/3 to do the proving
 provesWrap(Premises, Conclusion, [], X) :-
     proves(Premises, Conclusion, X).
 
