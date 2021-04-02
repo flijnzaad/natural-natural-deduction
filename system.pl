@@ -2,7 +2,7 @@
 %                 NATURAL NATURAL DEDUCTION THEOREM PROVER                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % by Flip Lijnzaad %
-%   version 0.17   %
+%   version 0.18   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % TODO: add the list of all previous lines to the predicate
@@ -24,69 +24,71 @@
 % line(X, Y) where X is the formula on the line, Y is the justification
 
 % conjunction elimination:
-proves(Premises, line(X, conjElim), _) :-
+proves(Premises, line(X, conjElim), _, _) :-
     member(line(and(X,_), _), Premises).
 
-proves(Premises, line(Y, conjElim), _) :-
+proves(Premises, line(Y, conjElim), _, _) :-
     member(line(and(_,Y), _), Premises).
 
 % conjunction introduction:
-proves(Premises, line(and(X,Y), conjIntro), _) :-
+proves(Premises, line(and(X,Y), conjIntro), _, _) :-
     member(line(X, _), Premises),
     member(line(Y, _), Premises).
 
 % disjunction introduction:
-proves(Premises, line(or(X, _), disjIntro), _) :-
+proves(Premises, line(or(X, _), disjIntro), _, _) :-
     member(line(X, _), Premises).
 
-proves(Premises, line(or(_, Y), disjIntro), _) :-
+proves(Premises, line(or(_, Y), disjIntro), _, _) :-
     member(line(Y, _), Premises).
 
 % implication elimination:
-proves(Premises, line(Y, impElim), _) :-
+proves(Premises, line(Y, impElim), _, _) :-
     member(line(if(X, Y), _), Premises),
     member(line(X, _), Premises).
 
 % bi-implication elimination:
-proves(Premises, line(Y, biimpElim), _) :-
+proves(Premises, line(Y, biimpElim), _, _) :-
     member(line(iff(X, Y), _), Premises),
     member(line(X, _), Premises).
 
-proves(Premises, line(X, biimpElim), _) :-
+proves(Premises, line(X, biimpElim), _, _) :-
     member(line(iff(X, Y), _), Premises),
     member(line(Y, _), Premises).
 
 % negation elimination:
-proves(Premises, line(X, negElim), _) :-
+proves(Premises, line(X, negElim), _, _) :-
     member(line(neg(neg(X)), _), Premises).
 
 % contradiction introduction:
-proves(Premises, line(contra, contraIntro), _) :-
+proves(Premises, line(contra, contraIntro), _, _) :-
     member(line(X, _), Premises),
     member(line(neg(X), _), Premises).
 
 % transitivity: => recursion
-proves(Premises, line(X, JustX), All) :-
+proves(Premises, line(X, JustX), AllOld, End) :-
     length(Premises, N),
-    N < 5,                               % bound the number of proof steps
-    proves(Premises, line(Y, JustY), AllOld),
+    N < 4,                               % bound the number of proof steps
+    proves(Premises, line(Y, JustY), AllOld, End),
+    write('AllOld: '), writeln(AllOld),
     \+ member(line(Y, _), Premises),     % don't prove lines you already have
     New = [line(Y, JustY)|Premises],
     append(AllOld, [line(Y, JustY)], AllNew),
-    proves(New, line(X, JustX), AllNew), !,
+    write('AllNew: '), writeln(AllNew),
+    proves(New, line(X, JustX), AllNew, End), !,
     append(AllNew, [line(X, JustX)], All),
+    write('All: '), writeln(All),
     printline(N, line(Y, JustY)),
-    printline(N, line(X, JustX)).
-    % All = [line(X, JustX)|New].
-    % reverse(Newer, All).
-    % writeln(All).
+    printline(N, line(X, JustX)),
+    write('End: '), writeln(End),
+    End = All.
 
 % reiteration / stop when goal reached:
-proves(Premises, line(X, reit), _) :-
+proves(Premises, line(X, reit), _, _) :-
     member(line(X, _), Premises).
 
 % contradiction elimination:
-proves(Premises, line(_, contraElim), _) :-
+proves(Premises, line(_, contraElim), _, _) :-
     member(line(contra, _), Premises).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -104,7 +106,7 @@ printline(N, Line) :-
 % provesWrap/4 takes care of printing the premises
 % and then calls proves/3 to do the proving
 provesWrap(Premises, Conclusion, [], X) :-
-    proves(Premises, Conclusion, X).
+    proves(Premises, Conclusion, Premises, X).
 
 provesWrap(Premises, Conclusion, [H|T], X) :-
     length(Premises, N),
@@ -117,9 +119,8 @@ q1(X) :-                                    % needs total 3 lines
     provesWrap(Premises, Concl, Premises, X).
 
 q2(X) :-                                    % needs total 3 lines
-    Premise = [line(and(p, q), premise), line(if(p, r), premise)], 
+    Premises = [line(and(p, q), premise), line(if(p, r), premise)], 
     Concl = line(r, _), 
-    reverse(Premise, Premises),
     provesWrap(Premises, Concl, Premises, X).
 
 q3(X) :-                                    % needs total 5 lines
