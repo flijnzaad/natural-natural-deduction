@@ -156,3 +156,12 @@ q8(X) :-                                    % needs total 7 lines
     Concl = line(and(and(and(p, q), r), s), _),
     provesWrap(Premises, Concl, Premises, X).
 
+q9(X) :-                                    % needs total 5 lines
+    Premises = [line(iff(p, q), premise), line(if(q, r), premise), line(p, premise)],
+    Concl = line(r, _),
+    provesWrap(Premises, Concl, Premises, X).
+
+q10(X) :-                                   % needs total 4 lines
+    Premises = [line(p, premise), line(neg(p), premise)],
+    Concl = line(q, _),
+    provesWrap(Premises, Concl, Premises, X).
