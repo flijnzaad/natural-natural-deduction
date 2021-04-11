@@ -40,9 +40,9 @@ This system uses [SWI Prolog](https://www.swi-prolog.org/download/stable) versio
 
 ## Predicates and functions of the knowledge base
 
-* Propositional logic formulas are built up from the following:
-  * atomic constants `p`, `q`, `r`, ...;
-  * special propositional atom `contra` for contradiction;
+* Propositional logic formulas are built up from the following constants and functions, which can be interpreted as prefix operators:
+  * atomic constants i.e. lowercase letters `p`, `q`, `r`, etc.
+  * special propositional atom `contra` for contradiction
   * unary operator: `neg(_)` (`not/1` is already defined in Prolog)
   * binary operators: 
     * `and(_, _)` for conjunction
@@ -58,3 +58,10 @@ This system uses [SWI Prolog](https://www.swi-prolog.org/download/stable) versio
   * just the number if only 1 citation
   * `two(x, y)` if two steps `x`, `y` need to be cited
   * `sub(x, y)` if a subproof `x - y` needs to be cited
+* `proves(X, Y, Z)`, where:
+    * `X` is a list of the proof lines up until now;
+    * `Y` is a formula that can be proven from `X`;
+    * `Z` is the list you had in `X`, plus the new line `Y` added. This is important for returning the full proof in the end.
+    * The justification rules are implemented in the base cases.
+    * The recursive case implements the transitivity of provability:
+        * `X` is provable from premises `P` if premises `P` can prove line `Y`, and premises `P` plus line `Y` can prove line `X`.
