@@ -2,21 +2,30 @@
 %                 NATURAL NATURAL DEDUCTION THEOREM PROVER                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % by Flip Lijnzaad %
-%   version 0.20   %
+%   version 0.21   %
 %%%%%%%%%%%%%%%%%%%%
 
-% TODO: add more cuts to the rule bodies but justify it theoretically
+% TODO: fix the order of the premises in the final list that's returned
+% TODO: implement iterative deepening
 % TODO: how to get rid of lines that turned out to be unnecessary in the proof?
 %       will that be a problem at all?
-% TODO: implement iterative deepening
+% TODO: add more cuts to the rule bodies but justify it theoretically:
+%       right now it lets you take another option
 % TODO: add line number support
-% TODO: fix the order of the premises in the final list that's returned
 
 % FIXME: q4 returns false: why?
+% FIXME: q11 already returns true at N < 3 which results in a wrong proof, 
+%        with lines missing
 % FIXME: add more testing queries that are more elaborate (maybe substitute some,
 %        because some of the current ones are nearly identical, keep the hardest
 %        ones)
-% FIXME: first query has an uninstantiated variable: why? (maybe fixed; test more)
+
+% This makes sure that answers are never abbreviated with "..."
+:- set_prolog_flag(answer_write_options,
+                    [ quoted(true),
+                      portray(true),
+                      spacing(next_argument)
+                    ]).
 
 % conjunction elimination:
 proves(Premises, line(X, conjElim), [line(X, conjElim)|Premises]) :-
@@ -26,7 +35,7 @@ proves(Premises, line(Y, conjElim), [line(Y, conjElim)|Premises]) :-
     member(line(and(_,Y), _), Premises).
 
 % conjunction introduction:
-proves(Premises, line(and(X,Y), conjIntro), [line(and(X,Y), conjIntro)|Premises]) :-
+proves(Premises, line(and(X, Y), conjIntro), [line(and(X,Y), conjIntro)|Premises]) :-
     member(line(X, _), Premises),
     member(line(Y, _), Premises).
 
@@ -61,28 +70,23 @@ proves(Premises, line(contra, contraIntro), [line(contra, contraIntro)|Premises]
     member(line(neg(X), _), Premises).
 
 % transitivity: => recursion
-% All contains all lines of the proof until now, 
-% End should eventually return the full proof
+% End eventually contains the full proof
 proves(Premises, line(X, JustX), End) :-
-    % bound the number of proof steps
+    % bound the number of proof lines
     length(Premises, N),
-    N < 5,
+    N < 3,
     % this derives 1 step from the premises, matching the simple rules
     proves(Premises, line(Y, JustY), P),
     % don't prove lines you already have
     \+ member(line(Y, _), Premises),
+    % add the proved line to the premises
     New = [line(Y, JustY)|Premises],
-    % this either matches with the base cases or goes into transitivity
-    proves(New, line(X, JustX), Q), !,
+    % this either matches with the base cases or goes into transitivity again
+    proves(New, line(X, JustX), End), !,
     write('P: '), writeln(P),
-    % Q is the right one! also, how to run Prolog without
-    % that ... stuff?
-    write('Q: '), writeln(Q),
+    write('End: '), writeln(End),
     printline(N, line(Y, JustY)),
-    printline(N, line(X, JustX)),
-    End = Q,
-    % write('Premises: '), writeln(Premises),
-    assertz(done(End)).
+    printline(N, line(X, JustX)).
 
 % reiteration / stop when goal reached:
 proves(Premises, line(X, reit), [line(X, reit)|Premises]) :-
@@ -107,7 +111,8 @@ printline(N, Line) :-
 % provesWrap/4 takes care of printing the premises
 % and then calls proves/3 to do the proving
 provesWrap(Premises, Conclusion, [], X) :-
-    proves(Premises, Conclusion, Y),
+    reverse(Premises, P),
+    proves(P, Conclusion, Y),
     reverse(Y, X).
 
 provesWrap(Premises, Conclusion, [H|T], X) :-
@@ -167,5 +172,10 @@ q10(X) :-                                   % needs total 4 lines
 
 q11(X) :-
     Premises = [line(and(and(and(and(and(p, q), r), s), t), u), premise)],
+    Concl = line(p, _),
+    provesWrap(Premises, Concl, Premises, X).
+
+q12(X) :-
+    Premises = [line(p, premise)],
     Concl = line(p, _),
     provesWrap(Premises, Concl, Premises, X).
