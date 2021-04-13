@@ -34,6 +34,9 @@ prove_bf_a([a(A,G)|Agenda],Goal):-
     append(Agenda,Children,NewAgenda),
     prove_bf_a(NewAgenda,Goal).
 
+a.
+b:- a.
+
 %%% DFS meta-interpreter
 dfs(true) :- !.
 dfs((G,R)) :- !, dfs(G), dfs(R).
