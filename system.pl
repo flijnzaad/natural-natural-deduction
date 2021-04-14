@@ -2,13 +2,10 @@
 %                 NATURAL NATURAL DEDUCTION THEOREM PROVER                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % by Flip Lijnzaad %
-%   version 0.21   %
+%   version 0.22   %
 %%%%%%%%%%%%%%%%%%%%
 
-% TODO: fix the order of the premises in the final list that's returned
 % TODO: implement iterative deepening
-% TODO: how to get rid of lines that turned out to be unnecessary in the proof?
-%       will that be a problem at all?
 % TODO: add more cuts to the rule bodies but justify it theoretically:
 %       right now it lets you take another option
 % TODO: add line number support
@@ -74,13 +71,12 @@ proves(Premises, line(contra, contraIntro), [line(contra, contraIntro)|Premises]
 proves(Premises, line(X, JustX), End) :-
     % bound the number of proof lines
     length(Premises, N),
-    N < 3,
-    % this derives 1 step from the premises, matching the simple rules
-    proves(Premises, line(Y, JustY), P),
+    N < 6,
+    % this derives 1 step from the premises, matching the simple rules.
+    % New will have the new line added to the Premises
+    proves(Premises, line(Y, JustY), New),
     % don't prove lines you already have
     \+ member(line(Y, _), Premises),
-    % add the proved line to the premises
-    New = [line(Y, JustY)|Premises],
     % this either matches with the base cases or goes into transitivity again
     proves(New, line(X, JustX), End), !,
     write('P: '), writeln(P),
