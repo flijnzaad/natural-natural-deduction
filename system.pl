@@ -2,7 +2,7 @@
 %                 NATURAL NATURAL DEDUCTION THEOREM PROVER                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % by Flip Lijnzaad %
-%   version 0.22   %
+%   version 1.0    %
 %%%%%%%%%%%%%%%%%%%%
 
 % TODO: implement iterative deepening
@@ -13,13 +13,6 @@
 % FIXME: add more testing queries that are more elaborate (maybe substitute some,
 %        because some of the current ones are nearly identical, keep the hardest
 %        ones)
-
-% This makes sure that answers are never abbreviated with "..."
-:- set_prolog_flag(answer_write_options,
-                    [ quoted(true),
-                      portray(true),
-                      spacing(next_argument)
-                    ]).
 
 % conjunction elimination:
 proves(Premises, line(X, conjElim), [line(X, conjElim)|Premises]) :-
@@ -64,14 +57,12 @@ proves(Premises, line(contra, contraIntro), [line(contra, contraIntro)|Premises]
     member(line(neg(X), _), Premises).
 
 % transitivity: => recursion
-% End eventually contains the full proof
 proves(Premises, line(X, JustX), End) :-
     % bound the number of proof lines
     length(Premises, N),
-    N < 3,
-    % this derives 1 step from the premises, matching the simple rules.
-    % New will have the new line added to the Premises
-    proves(Premises, line(Y, JustY), New),
+    N < 6,
+    % derive 1 step from the premises, matching the simple rules
+    proves(Premises, line(_, _), New),
     % this either matches with the base cases or goes into transitivity again
     proves(New, line(X, JustX), End), !.
 
@@ -82,8 +73,6 @@ proves(Premises, line(X, reit), [line(X, reit)|Premises]) :-
 % contradiction elimination:
 proves(Premises, line(X, contraElim), [line(X, contraElim)|Premises]) :-
     member(line(contra, _), Premises).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % provesWrap/3 takes care of reversing the premises,
 % then calls proves/3 to do the proving,
