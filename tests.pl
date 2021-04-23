@@ -5,9 +5,26 @@
 
 main :-
     consult('system.pl'),
-    q1(X), writeln(X),
-    q2(Y), writeln(Y),
+    writeln('q1: '), q1(_1), writelines(_1), nl,
+    writeln('q2: '), q2(_2), writelines(_2), nl,
+    writeln('q3: '), q3(_3), writelines(_3), nl,
+    writeln('q4: '), q4(_4), writelines(_4), nl,
+    writeln('q5: '), q5(_5), writelines(_5), nl,
+    writeln('q6: '), q6(_6), writelines(_6), nl,
+    writeln('q7: '), q7(_7), writelines(_7), nl,
+    writeln('q8: '), q8(_8), writelines(_8), nl,
+    writeln('q9: '), q9(_9), writelines(_9), nl,
+    writeln('q10: '), q10(_10), writelines(_10), nl,
+    writeln('q11: '), q11(_11), writelines(_11), nl,
+    writeln('q12: '), q12(_12), writelines(_12), nl,
     halt(0).
+
+writelines([]).
+
+writelines([H|T]) :-
+    H = line(A, J),
+    write(A), tab(4), write(J), nl,
+    writelines(T).
 
 q1(X) :-                                    % needs total 3 lines
     Premises = [line(and(p, q), premise)],
