@@ -128,5 +128,8 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-
+### Added own
 proofs.txt
+interface/*.aux
+interface/*.log
+interface/*.pdf
