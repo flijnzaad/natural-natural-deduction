@@ -51,7 +51,7 @@ q5(X) :-                                    % needs total 5 lines
     Concl = line(and(q, or(r, p)), _),
     provesWrap(Premises, Concl, X).
 
-q6(X) :-                                    % needs total 5 lines
+q6(X) :-                                    % needs total 4 lines
     Premises = [line(and(p, q), premise)],
     Concl = line(and(p, or(p, q)), _),
     provesWrap(Premises, Concl, X).
