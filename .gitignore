@@ -133,3 +133,4 @@ proofs.txt
 interface/*.aux
 interface/*.log
 interface/*.pdf
+!interface/interface_flowchart.pdf
