@@ -57,22 +57,9 @@ proves(Premises, line(X, contraElim), [line(X, contraElim)|Premises], _) :-
 proves(Premises, line(X, reit), [line(X, reit)|Premises], _) :-
     member(line(X, _), Premises).
 
-proves(Premises, Line, New, D) :-
-    % bound the number of proof lines
-    length(Premises, N),
-    N > D, !,
-    % write('D = '), write(D), writeln('; depth exceeded, backtrack'),
-    % tab(7), writeln(Premises),
-    fail. % force backtracking FIXME: why doesn't this work?
-
-% base case for iterative deepening: if maximum search depth reached,
-% cut the other branches and evaluate to false to force backtracking
-% provesIDS(_, _, _, D) :-
-%     D >= 7, !, fail.
-
 % transitivity:
 proves(Premises, line(X, JustX), End, D) :-
-    % bound the number of proof lines
+    % don't exceed the current depth D
     length(Premises, N),
     N =< D,
     % derive 1 line from the premises
@@ -80,23 +67,23 @@ proves(Premises, line(X, JustX), End, D) :-
     % with this step added to the premises, derive line X
     proves(New, line(X, JustX), End, D), !.
 
-% recursive case for iterative deepening
+% try to prove Line at the current depth
 provesIDS(Premises, Line, New, D) :-
     proves(Premises, Line, New, D), !.
 
-% recursive case for iterative deepening
+% else do iterative deepening: increment the depth and try again
 provesIDS(Premises, Line, New, D) :-
     Dnew is D + 1,
+    % don't exceed the maximum proof length
     Dnew < 10,
-    % write('D = '), writeln(Dnew),
-    % write('Premises deep:  '), writeln(Premises),
     provesIDS(Premises, Line, New, Dnew).
 
 % provesWrap/3 reverses the premises,
-% then calls proves/3 to do the proving,
+% then calls provesIDS/4 to do the proving,
 % then reverses the final resulting proof in the end
 provesWrap(Premises, Conclusion, X) :-
     reverse(Premises, P),
+    % initial proof depth: number of premises
     length(Premises, N),
     provesIDS(P, Conclusion, Y, N),
     reverse(Y, X).
