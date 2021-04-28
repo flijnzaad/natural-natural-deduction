@@ -1,41 +1,31 @@
-% concatenate the two strings
-concatBinary(Connective, StringX, StringY, String) :-
-    atomics_to_string(["(", StringX, Connective, StringY, ")"], " ", String).
-
-% the cut is needed to not get the other option of "CONTRA"
+% the cut is needed to not consider the other option with capitalization
 stringOf(contra, "\\lfalse") :- !.
 
-% turn an atomic sentence into a capitalized string
+% parse an atomic sentence to a capitalized string
 stringOf(X, String) :-
     % only do this for atomic sentences
     atom(X),
-    % turn the atom into a string
-    atom_string(X, StringLower),
     % make the string uppercase
-    string_upper(StringLower, String).
+    string_upper(X, String).
 
-% no parentheses needed around negated sentences because all binary connectives
-% put parentheses around the subparts already
+% parse negation
 stringOf(neg(X), String) :-
     stringOf(X, StringX),
+    % no parentheses needed around negated sentences because binary connectives
+    % put parentheses around the subparts already
     atomics_to_string(["\\lnot", StringX], " ", String).
 
-stringOf(and(X, Y), String) :-
+% parse binary connectives
+stringOf(Formula, String) :-
+    % get the name of the binary connective
+    functor(Formula, Name, 2),
+    % put \l in front of it (\land, \lor, etc.)
+    string_concat("\\l", Name, Connective),
+    % get the arguments of the connective
+    arg(1, Formula, X),
+    arg(2, Formula, Y),
     stringOf(X, StringX),
     stringOf(Y, StringY),
-    concatBinary("\\land", StringX, StringY, String).
-
-stringOf(or(X, Y), String) :-
-    stringOf(X, StringX),
-    stringOf(Y, StringY),
-    concatBinary("\\lor", StringX, StringY, String).
-
-stringOf(if(X, Y), String) :-
-    stringOf(X, StringX),
-    stringOf(Y, StringY),
-    concatBinary("\\lif", StringX, StringY, String).
-
-stringOf(iff(X, Y), String) :-
-    stringOf(X, StringX),
-    stringOf(Y, StringY),
-    concatBinary("\\liff", StringX, StringY, String).
+    % concatenate the two strings with the connective in between,
+    % surrounded by disambiguating parentheses
+    atomics_to_string(["(", StringX, Connective, StringY, ")"], " ", String).
