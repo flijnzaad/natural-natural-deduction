@@ -16,10 +16,16 @@ for line in q[0]["X"]:
 print(proof)
 
 # compiling and opening a LaTeX pdf
-import os
+import os, subprocess, platform
+filepath = 'example.pdf'
 
-compile_pdf = 'pdflatex example.tex'
+compile = 'pdflatex example.tex'
+# TODO: maybe this is also OS-specific
 os.system(compile_pdf)
 
-open_pdf = 'xdg-open example.pdf'
-os.system(open_pdf)
+if platform.system() == 'Darwin':           # macOS
+    subprocess.call(('open', filepath))
+elif platform.system() == 'Windows':        # Windows
+    os.startfile(filepath)
+else:                                       # linux variants
+    subprocess.call(('xdg-open', filepath))
