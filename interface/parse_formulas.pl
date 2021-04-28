@@ -1,12 +1,18 @@
-concatBinary(StringX, StringY, String) :-
-    atomics_to_string(["(", StringX, "\\land", StringY, ")"], " ", String).
+% concatenate the two strings
+concatBinary(Connective, StringX, StringY, String) :-
+    atomics_to_string(["(", StringX, Connective, StringY, ")"], " ", String).
 
-% TODO: research the difference between single and double quotes
-stringOf(p, "P").
-stringOf(q, "Q").
-stringOf(r, "R").
-stringOf(s, "S").
-stringOf(contra, "\\lfalse").
+% the cut is needed to not get the other option of "CONTRA"
+stringOf(contra, "\\lfalse") :- !.
+
+% turn an atomic sentence into a capitalized string
+stringOf(X, String) :-
+    % only do this for atomic sentences
+    atom(X),
+    % turn the atom into a string
+    atom_string(X, StringLower),
+    % make the string uppercase
+    string_upper(StringLower, String).
 
 % no parentheses needed around negated sentences because all binary connectives
 % put parentheses around the subparts already
@@ -17,19 +23,19 @@ stringOf(neg(X), String) :-
 stringOf(and(X, Y), String) :-
     stringOf(X, StringX),
     stringOf(Y, StringY),
-    concatBinary(StringX, StringY, String).
+    concatBinary("\\land", StringX, StringY, String).
 
 stringOf(or(X, Y), String) :-
     stringOf(X, StringX),
     stringOf(Y, StringY),
-    concatBinary(StringX, StringY, String).
+    concatBinary("\\lor", StringX, StringY, String).
 
 stringOf(if(X, Y), String) :-
     stringOf(X, StringX),
     stringOf(Y, StringY),
-    concatBinary(StringX, StringY, String).
+    concatBinary("\\lif", StringX, StringY, String).
 
 stringOf(iff(X, Y), String) :-
     stringOf(X, StringX),
     stringOf(Y, StringY),
-    concatBinary(StringX, StringY, String).
+    concatBinary("\\liff", StringX, StringY, String).
