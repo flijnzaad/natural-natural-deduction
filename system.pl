@@ -1,17 +1,4 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                 NATURAL NATURAL DEDUCTION THEOREM PROVER                   %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% by Flip Lijnzaad %
-%   version 1.2    %
-%%%%%%%%%%%%%%%%%%%%
-
-% TODO: add line number support
-% TODO: see https://staff.fnwi.uva.nl/u.endriss/teaching/prolog/prolog.pdf
-% page 43 for maybe defining infix operators for things
-
-% FIXME: add more testing queries that are more elaborate (maybe substitute some,
-%        because some of the current ones are nearly identical, keep the hardest
-%        ones)
+% version 1.2
 
 % This makes sure that answers are never abbreviated with "..."
 :- set_prolog_flag(answer_write_options,
@@ -75,13 +62,13 @@ proves(Premises, _, _, D) :-
     length(Premises, N),
     N > D, !,
     write('D = '), write(D), writeln('; depth exceeded, backtrack'),
-    tab(7), write('Premises = '), writeln(Premises),
-    fail.
+    tab(7), writeln(Premises),
+    fail.  % force backtracking FIXME: why doesn't this work?
 
 % base case for iterative deepening: if maximum search depth reached,
 % cut the other branches and evaluate to false to force backtracking
 proves(_, _, _, D) :-
-    D >= 5, !, fail.
+    D >= 7, !, fail.
 
 % transitivity:
 proves(Premises, line(X, JustX), End, D) :-
@@ -98,8 +85,7 @@ proves(Premises, Line, New, D) :-
     Dnew is D + 1,
     write('D = '), writeln(Dnew),
     write('Premises deep:  '), writeln(Premises),
-    onlyPremises(Premises, P),
-    proves(P, Line, New, Dnew).
+    proves(Premises, Line, New, Dnew).
 
 % provesWrap/3 reverses the premises,
 % then calls proves/3 to do the proving,
@@ -109,19 +95,3 @@ provesWrap(Premises, Conclusion, X) :-
     length(Premises, N),
     proves(P, Conclusion, Y, N),
     reverse(Y, X).
-
-% if you don't have any lines left, you're done
-onlyPremises([], R, R).
-
-% a line that's not a premise shouldn't be included; then you're done
-onlyPremises([line(_, J)|_], R, R) :-
-    J \= premise.
-
-% add each premise to the list A
-onlyPremises([line(X, premise)|T], A, R) :-
-    onlyPremises(T, [line(X, premise)|A], R).
-
-onlyPremises(Premises, Result) :-
-    % get the `normal' order, with the premises at the start
-    reverse(Premises, P),
-    onlyPremises(P, [], Result), !.
