@@ -89,4 +89,5 @@ provesWrap(Premises, Conclusion, X) :-
     % initial proof depth: number of premises
     length(Premises, N),
     provesIDS(P, Conclusion, Y, N),
-    reverse(Y, X).
+    % newline for neat progress printing
+    reverse(Y, X), nl.
