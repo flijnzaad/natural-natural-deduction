@@ -1,4 +1,10 @@
 :- consult('parse_formulas.pl'), consult('parse_justifications.pl').
+:- set_prolog_flag(answer_write_options,
+                    [ quoted(true),
+                      portray(true),
+                      spacing(next_argument),
+                      character_escapes(false)
+                    ]).
 
 % return the code for one line in String
 oneLine(Formula, Justification, String) :-
@@ -33,4 +39,4 @@ buildLines([line(X, J)|T], Build, String) :-
 buildProof(Lines, String) :-
     buildPremises(Lines, Rest, "", String1),
     buildLines(Rest, "", String2),
-    atomics_to_string(["\\fitch{\n", String1, "}{\n", String2, "}\n"], "", String).
+    atomics_to_string(["\n\\fitch{\n", String1, "}{\n", String2, "}\n"], "", String).
