@@ -27,107 +27,107 @@ main :-
 writelines([]).
 
 writelines([H|T]) :-
-    H = line(A, J),
-    write(A), tab(4), write(J), nl,
+    H = line(N, A, J),
+    write(N), tab(2), write(A), tab(4), write(J), nl,
     writelines(T).
 
 q1(X) :-                                    % needs total 3 lines
-    Premises = [line(and(p, q), premise)],
-    Concl = line(or(p,q), _),
+    Premises = [line(1, and(p, q), premise)],
+    Concl = line(_, or(p,q), _),
     provesWrap(Premises, Concl, X).
 
 q2(X) :-                                    % needs total 3 lines
-    Premises = [line(and(p, q), premise),
-                line(if(p, r), premise)],
-    Concl = line(r, _),
+    Premises = [line(1, and(p, q), premise),
+                line(2, if(p, r), premise)],
+    Concl = line(_, r, _),
     provesWrap(Premises, Concl, X).
 
 q3(X) :-                                    % needs total 5 lines
-    Premises = [line(p, premise),
-                line(q, premise), 
-                line(r, premise)],
-    Concl = line(and(and(p, q), r), _),
+    Premises = [line(1, p, premise),
+                line(2, q, premise), 
+                line(3, r, premise)],
+    Concl = line(_, and(and(p, q), r), _),
     provesWrap(Premises, Concl, X).
 
 q4(X) :-                                    % needs total 7 lines
-    Premises = [line(and(p, q), premise)],
-    Concl = line(and(and(q, and(p, p)), or(p, p)), _),
+    Premises = [line(1, and(p, q), premise)],
+    Concl = line(_, and(and(q, and(p, p)), or(p, p)), _),
     provesWrap(Premises, Concl, X).
 
 q5(X) :-                                    % needs total 5 lines
-    Premises = [line(and(p, q), premise)],
-    Concl = line(and(q, or(r, p)), _),
+    Premises = [line(1, and(p, q), premise)],
+    Concl = line(_, and(q, or(r, p)), _),
     provesWrap(Premises, Concl, X).
 
 q6(X) :-                                    % needs total 4 lines
-    Premises = [line(and(p, q), premise)],
-    Concl = line(and(p, or(p, q)), _),
+    Premises = [line(1, and(p, q), premise)],
+    Concl = line(_, and(p, or(p, q)), _),
     provesWrap(Premises, Concl, X).
 
 q7(X) :-                                    % needs total 4 lines
-    Premises = [line(and(p, q), premise)],
-    Concl = line(and(or(p, q), p), _),
+    Premises = [line(1, and(p, q), premise)],
+    Concl = line(_, and(or(p, q), p), _),
     provesWrap(Premises, Concl, X).
 
 q8(X) :-                                    % needs total 7 lines
-    Premises = [line(p, premise),
-                line(q, premise),
-                line(r, premise),
-                line(s, premise)],
-    Concl = line(and(and(and(p, q), r), s), _),
+    Premises = [line(1, p, premise),
+                line(2, q, premise),
+                line(3, r, premise),
+                line(4, s, premise)],
+    Concl = line(_, and(and(and(p, q), r), s), _),
     provesWrap(Premises, Concl, X).
 
 q9(X) :-                                    % needs total 5 lines
-    Premises = [line(iff(p, q), premise),
-                line(if(q, r), premise), 
-                line(p, premise)],
-    Concl = line(r, _),
+    Premises = [line(1, iff(p, q), premise),
+                line(2, if(q, r), premise), 
+                line(3, p, premise)],
+    Concl = line(_, r, _),
     provesWrap(Premises, Concl, X).
 
 q10(X) :-                                   % needs total 4 lines
-    Premises = [line(p, premise),
-                line(neg(p), premise)],
-    Concl = line(q, _),
+    Premises = [line(1, p, premise),
+                line(2, neg(p), premise)],
+    Concl = line(_, q, _),
     provesWrap(Premises, Concl, X).
 
 q11(X) :-                                   % needs total 6 lines
-    Premises = [line(and(and(and(and(and(p, q), r), s), t), u), premise)],
-    Concl = line(p, _),
+    Premises = [line(1, and(and(and(and(and(p, q), r), s), t), u), premise)],
+    Concl = line(_, p, _),
     provesWrap(Premises, Concl, X).
 
 q12(X) :-                                   % needs total 2 lines
-    Premises = [line(p, premise)],
-    Concl = line(p, _),
+    Premises = [line(1, p, premise)],
+    Concl = line(_, p, _),
     provesWrap(Premises, Concl, X).
 
 q13(X) :-                                   % needs total 7 lines
-    Premises = [line(and(b, c), premise),
-                line(neg(a), premise),
-                line(if(neg(a), neg(c)), premise)],
-    Concl = line(neg(b), _),
+    Premises = [line(1, and(b, c), premise),
+                line(2, neg(a), premise),
+                line(3, if(neg(a), neg(c)), premise)],
+    Concl = line(_, neg(b), _),
     provesWrap(Premises, Concl, X).
 
 q14(X) :-                                   % needs total 3 lines
-    Premises = [line(b, premise),
-                line(neg(b), premise)],
-    Concl = line(or(b, neg(b)), _),
+    Premises = [line(1, b, premise),
+                line(2, neg(b), premise)],
+    Concl = line(_, or(b, neg(b)), _),
     provesWrap(Premises, Concl, X).
 
 q15(X) :-                                   % needs total 4 lines
-    Premises = [line(b, premise),
-                line(neg(b), premise)],
-    Concl = line(and(b, or(b, neg(b))), _),
+    Premises = [line(1, b, premise),
+                line(2, neg(b), premise)],
+    Concl = line(_, and(b, or(b, neg(b))), _),
     provesWrap(Premises, Concl, X).
 
 q16(X) :-                                   % needs total 9 lines
-    Premises = [line(if(a, b), premise),
-                line(neg(and(c, b)), premise),
-                line(and(a, c), premise)],
-    Concl = line(neg(and(a, c)), _),
+    Premises = [line(1, if(a, b), premise),
+                line(2, neg(and(c, b)), premise),
+                line(3, and(a, c), premise)],
+    Concl = line(_, neg(and(a, c)), _),
     provesWrap(Premises, Concl, X).
 
 q17(X) :-                                   % needs total 8 lines
-    Premises = [line(and(a, b), premise),
-                line(and(if(b, c), if(c, d)), premise)],
-    Concl = line(or(d, f), _),
+    Premises = [line(1, and(a, b), premise),
+                line(2, and(if(b, c), if(c, d)), premise)],
+    Concl = line(_, or(d, f), _),
     provesWrap(Premises, Concl, X).
