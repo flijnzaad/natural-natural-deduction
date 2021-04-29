@@ -1,4 +1,4 @@
-% version 1.3
+% version 1.4
 
 % This makes sure that answers are never abbreviated with "..."
 :- set_prolog_flag(answer_write_options,
@@ -6,6 +6,15 @@
                       portray(true),
                       spacing(next_argument)
                     ]).
+
+% contradiction introduction:
+proves(Premises, line(contra, contraIntro), [line(contra, contraIntro)|Premises], _) :-
+    member(line(X, _), Premises),
+    member(line(neg(X), _), Premises).
+
+% contradiction elimination:
+proves(Premises, line(X, contraElim), [line(X, contraElim)|Premises], _) :-
+    member(line(contra, _), Premises).
 
 % conjunction elimination:
 proves(Premises, line(X, conjElim), [line(X, conjElim)|Premises], _) :-
@@ -43,15 +52,6 @@ proves(Premises, line(X, biimpElim), [line(X, biimpElim)|Premises], _) :-
 % negation elimination:
 proves(Premises, line(X, negElim), [line(X, negElim)|Premises], _) :-
     member(line(neg(neg(X)), _), Premises).
-
-% contradiction introduction:
-proves(Premises, line(contra, contraIntro), [line(contra, contraIntro)|Premises], _) :-
-    member(line(X, _), Premises),
-    member(line(neg(X), _), Premises).
-
-% contradiction elimination:
-proves(Premises, line(X, contraElim), [line(X, contraElim)|Premises], _) :-
-    member(line(contra, _), Premises).
 
 % reiteration:
 proves(Premises, line(X, reit), [line(X, reit)|Premises], _) :-
