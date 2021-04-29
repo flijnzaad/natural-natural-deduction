@@ -129,8 +129,11 @@ dmypy.json
 .pyre/
 
 ### Added own
-proofs.txt
+# don't add any of the generated LaTeX files
 interface/*.aux
 interface/*.log
 interface/*.pdf
+interface/*.tex
+# but make an exception for the preamble, and flowchart pdf
+!interface/preamble.tex
 !interface/interface_flowchart.pdf
