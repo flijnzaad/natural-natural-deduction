@@ -12,7 +12,8 @@ stringCon("imp", "\lif").
 stringCon("biimp", "\liff").
 stringCon("contra", "\lfalse").
 
-stringJust(premise, "").
+stringJust(premise, "") :- !.
+stringJust(reit, "Reit") :- !.
 
 stringJust(Justification, String) :-
     sub_string(Justification, _, 5, 0, "Intro"), !,
