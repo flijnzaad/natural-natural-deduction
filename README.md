@@ -2,11 +2,16 @@
 Repository for the Natural Natural Deduction system: a theorem prover for propositional logic and first-order logic that uses natural deduction and heuristics to find its proofs.
 
 ## Dependencies
-This system uses [SWI Prolog](https://www.swi-prolog.org/download/stable) version >= 8.2.4.
+* [SWI Prolog](https://www.swi-prolog.org/download/stable) version >= 8.2.4 for finding proofs and parsing to LaTeX code
+* [Python](https://www.python.org/) version >= 3.8.5 for file operations
+* [pdflatex/TeX Live 2020](https://tug.org/texlive/) for compiling a LaTeX document
 
-## Running the system
+## Running via interfacing
+* To run all available test queries and produce a LaTeX document of them, `cd` to the `interface` directory and run `python3 interface.py`. The system will print some progress statements and open a compiled PDF.
+
+## Running `system.pl`
 ### Starting, stopping and loading the system
-* You can load the system by passing the program to your Prolog interpreter (`prolog`, `swipl` etc.) directly:
+* You can load the system by passing the program to the Prolog interpreter (`prolog` and `swipl` are equivalent commands) directly:
 
       $ prolog system.pl
 
@@ -16,6 +21,11 @@ This system uses [SWI Prolog](https://www.swi-prolog.org/download/stable) versio
 
     * `make/0` consults all source files that have been changed since they were consulted.
     * If you started the interpreter without arguments (i.e. just `prolog`), you first need to load the knowledge base using `[system].` before you can use `make.`.
+* To load the testing queries:
+
+      ?- [tests].
+
+    * `tests.pl` by default halts once all queries have been handled. If you want to stay in the interpreter, press <kbd>Ctrl</kbd> + <kbd>C</kbd> and then <kbd>a</kbd> to stop execution and abort.
 
 * The Prolog interpreter can be stopped with <kbd>Ctrl</kbd> + <kbd>D</kbd>, or by typing:
 
@@ -38,30 +48,41 @@ This system uses [SWI Prolog](https://www.swi-prolog.org/download/stable) versio
 
 * If your query returns `true` without a full stop at the end, there are still alternative branches of the search tree to be explored. Press <kbd>;</kbd> to explore another branch, press <kbd>.</kbd> or <kbd>Enter</kbd> to terminate the search there.
 
-## Predicates and functions of the knowledge base
+* To find out how long execution of a query is taking, you may use the [`time/1`](https://www.swi-prolog.org/pldoc/man?predicate=time%2f1) predicate, e.g. `time(q5(X))`.
 
-* Propositional logic formulas are built up from the following constants and functions, which can be interpreted as prefix operators:
-  * atomic constants i.e. lowercase letters `p`, `q`, `r`, etc.
-  * special propositional atom `contra` for contradiction
-  * unary operator: `neg(_)` (`not/1` is already defined in Prolog)
-  * binary operators: 
-    * `and(_, _)` for conjunction
-    * `or(_, _)` for disjunction
-    * `if(_, _)` for implication
-    * `iff(_, _)` for bi-implication
-* Justifications are as follows:
-  * `[conj|disj|neg|imp|biimp|contra][Intro|Elim]` for the introduction and elimination rules
-  * `premise` if the line is a premise
-  * `reit` if the line is a reiteration
-* Citing line numbers (experimental/for the future):
-  * `0` if the line is a premise (of a subproof)
-  * just the number if only 1 citation
-  * `two(x, y)` if two steps `x`, `y` need to be cited
-  * `sub(x, y)` if a subproof `x - y` needs to be cited
-* `proves(X, Y, Z)`, where:
-    * `X` is a list of the proof lines up until now;
-    * `Y` is a formula that can be proven from `X`;
-    * `Z` is the list you had in `X`, plus the new line `Y` added. This is important for returning the full proof in the end.
-    * The justification rules are implemented in the base cases.
-    * The recursive case implements the transitivity of provability:
-        * `X` is provable from premises `P` if premises `P` can prove line `Y`, and premises `P` plus line `Y` can prove line `X`.
+## Predicates and functions of `system.pl`
+
+Propositional logic formulas are built up from the following constants and functions, which can be interpreted as prefix operators:
+
+* atomic constants i.e. lowercase letters `p`, `q`, `r`, etc.
+* special propositional atom `contra` for contradiction
+* unary operator: `neg(_)` (`not/1` is already defined in Prolog)
+* binary operators: `and(_, _)` for conjunction, `or(_, _)` for disjunction, `if(_, _)` for implication, `iff(_, _)` for bi-implication
+
+Justifications are as follows:
+* `[conj|disj|neg|imp|biimp|contra][Intro|Elim]` for the introduction and elimination rules
+* `premise` if the line is a premise
+* `reit` if the line is a reiteration
+
+Citing line numbers (experimental/for the future):
+* `0` if the line is a premise (of a subproof)
+* just the number if only 1 citation
+* `two(x, y)` if two steps `x`, `y` need to be cited
+* `sub(x, y)` if a subproof `x - y` needs to be cited
+
+The line number `N`, formula `F`, justification `J` and citation `C` of a proof line are combined in a functor `line(N, F, J, C)`.
+
+`proves(X, Y, Z, D)`, where:
+* `X` is a list of the proof lines up until now;
+* `Y` is a formula that can be proven from `X`;
+* `Z` is the list you had in `X`, plus the new line `Y` added. This is important for returning the full proof in the end;
+* `D` is the current maximum search depth in the iterative deepening.
+* The justification rules are implemented in the base cases.
+* The recursive case implements the transitivity of provability: `X` is provable from premises `P` if premises `P` can prove line `Y`, and premises `P` plus line `Y` can prove line `X`.
+
+## The structure of the parsing system
+`system.pl` returns proofs in a Prolog list with the line functor that's described above. The parsing system has the following components, located in the `interface` directory:
+* `parse_formulas.pl` contains the `stringFormula/2` predicate. When given a formula in Prolog format with prefix operators, this predicate will return the LaTeX code for this formula.
+* `parse_justifications.pl` contains the `stringJust/2` predicate. When given a justification in Prolog format, this predicate will return the LaTeX code for it.
+* `build_proof.pl` first of all 'consults' (loads) the above two programs. When given a proof in the Prolog format (i.e. a list of lines that use the `line` functor), it returns the LaTeX code for a full Fitch-style proof.
+* `interface.py` loads the system and `build_proof.pl`. It runs each of the testing queries in `tests.pl`, 'builds' their LaTeX code and combines this with the given preamble into a `proof.tex` file. Lastly, it compiles the tex file using `pdflatex` and opens the resulting pdf.
