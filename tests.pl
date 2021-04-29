@@ -17,6 +17,11 @@ main :-
     writeln('q10: '), q10(_10), writelines(_10), nl,
     writeln('q11: '), q11(_11), writelines(_11), nl,
     writeln('q12: '), q12(_12), writelines(_12), nl,
+    writeln('q13: '), q13(_13), writelines(_13), nl,
+    writeln('q14: '), q14(_14), writelines(_14), nl,
+    writeln('q15: '), q15(_15), writelines(_15), nl,
+    writeln('q16: '), q16(_16), writelines(_16), nl,
+    writeln('q17: '), q17(_17), writelines(_17), nl,
     halt(0).
 
 writelines([]).
@@ -32,12 +37,15 @@ q1(X) :-                                    % needs total 3 lines
     provesWrap(Premises, Concl, X).
 
 q2(X) :-                                    % needs total 3 lines
-    Premises = [line(and(p, q), premise), line(if(p, r), premise)],
+    Premises = [line(and(p, q), premise),
+                line(if(p, r), premise)],
     Concl = line(r, _),
     provesWrap(Premises, Concl, X).
 
 q3(X) :-                                    % needs total 5 lines
-    Premises = [line(p, premise), line(q, premise), line(r, premise)],
+    Premises = [line(p, premise),
+                line(q, premise), 
+                line(r, premise)],
     Concl = line(and(and(p, q), r), _),
     provesWrap(Premises, Concl, X).
 
@@ -62,26 +70,64 @@ q7(X) :-                                    % needs total 4 lines
     provesWrap(Premises, Concl, X).
 
 q8(X) :-                                    % needs total 7 lines
-    Premises = [line(p, premise), line(q, premise), line(r, premise), line(s, premise)],
+    Premises = [line(p, premise),
+                line(q, premise),
+                line(r, premise),
+                line(s, premise)],
     Concl = line(and(and(and(p, q), r), s), _),
     provesWrap(Premises, Concl, X).
 
 q9(X) :-                                    % needs total 5 lines
-    Premises = [line(iff(p, q), premise), line(if(q, r), premise), line(p, premise)],
+    Premises = [line(iff(p, q), premise),
+                line(if(q, r), premise), 
+                line(p, premise)],
     Concl = line(r, _),
     provesWrap(Premises, Concl, X).
 
 q10(X) :-                                   % needs total 4 lines
-    Premises = [line(p, premise), line(neg(p), premise)],
+    Premises = [line(p, premise),
+                line(neg(p), premise)],
     Concl = line(q, _),
     provesWrap(Premises, Concl, X).
 
-q11(X) :-
+q11(X) :-                                   % needs total 6 lines
     Premises = [line(and(and(and(and(and(p, q), r), s), t), u), premise)],
     Concl = line(p, _),
     provesWrap(Premises, Concl, X).
 
-q12(X) :-
+q12(X) :-                                   % needs total 2 lines
     Premises = [line(p, premise)],
     Concl = line(p, _),
+    provesWrap(Premises, Concl, X).
+
+q13(X) :-                                   % needs total 7 lines
+    Premises = [line(and(b, c), premise),
+                line(neg(a), premise),
+                line(if(neg(a), neg(c)), premise)],
+    Concl = line(neg(b), _),
+    provesWrap(Premises, Concl, X).
+
+q14(X) :-                                   % needs total 3 lines
+    Premises = [line(b, premise),
+                line(neg(b), premise)],
+    Concl = line(or(b, neg(b)), _),
+    provesWrap(Premises, Concl, X).
+
+q15(X) :-                                   % needs total 4 lines
+    Premises = [line(b, premise),
+                line(neg(b), premise)],
+    Concl = line(and(b, or(b, neg(b))), _),
+    provesWrap(Premises, Concl, X).
+
+q16(X) :-                                   % needs total 9 lines
+    Premises = [line(if(a, b), premise),
+                line(neg(and(c, b)), premise),
+                line(and(a, c), premise)],
+    Concl = line(neg(and(a, c)), _),
+    provesWrap(Premises, Concl, X).
+
+q17(X) :-                                   % needs total 8 lines
+    Premises = [line(and(a, b), premise),
+                line(and(if(b, c), if(c, d)), premise)],
+    Concl = line(or(d, f), _),
     provesWrap(Premises, Concl, X).
