@@ -1,4 +1,4 @@
-% version 1.5
+% version 2.0
 
 % This makes sure that answers are never abbreviated with "..."
 :- set_prolog_flag(answer_write_options,
@@ -6,6 +6,19 @@
                       portray(true),
                       spacing(next_argument)
                     ]).
+
+currentLineNumber([], 0).
+
+currentLineNumber(line(_, _), 1).
+
+currentLineNumber([H|T], N) :-
+    currentLineNumber(H, A),
+    currentLineNumber(T, B),
+    N is A + B.
+
+nextLineNumber(L, N) :-
+    currentLineNumber(L, Current),
+    N is Current + 1.
 
 % contradiction introduction:
 proves(Premises, line(contra, contraIntro), [line(contra, contraIntro)|Premises], _) :-
