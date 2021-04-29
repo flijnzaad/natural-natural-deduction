@@ -69,12 +69,12 @@ proves(Premises, line(Next, Y, biimpElim, two(N1, N2)), [line(Next, Y, biimpElim
 
 proves(Premises, line(Next, X, biimpElim, two(N1, N2)), [line(Next, X, biimpElim, two(N1, N2))|Premises], _) :-
     member(line(N1, iff(X, Y), _, _), Premises),
-    member(line(N2, X, _, _), Premises),
+    member(line(N2, Y, _, _), Premises),
     nextLineNumber(Premises, Next).
 
 % negation elimination:
 proves(Premises, line(Next, X, negElim, N), [line(Next, X, negElim, N)|Premises], _) :-
-    member(line(N, neg(neg(X)), _, _,), Premises),
+    member(line(N, neg(neg(X)), _, _), Premises),
     nextLineNumber(Premises, Next).
 
 % reiteration:
