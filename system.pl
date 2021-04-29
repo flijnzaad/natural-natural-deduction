@@ -1,4 +1,4 @@
-% version 1.4
+% version 1.5
 
 % This makes sure that answers are never abbreviated with "..."
 :- set_prolog_flag(answer_write_options,
@@ -63,7 +63,9 @@ proves(Premises, line(X, JustX), End, D) :-
     length(Premises, N),
     N =< D,
     % derive 1 line from the premises
-    proves(Premises, line(_, _), New, D),
+    proves(Premises, line(Y, _), New, D),
+    % don't prove lines you already have (heuristic)
+    \+ member(line(Y, _), Premises),
     % with this step added to the premises, derive line X
     proves(New, line(X, JustX), End, D), !.
 
@@ -76,6 +78,7 @@ provesIDS(Premises, Line, New, D) :-
     Dnew is D + 1,
     % don't exceed the maximum proof length
     Dnew < 10,
+    write('Trying search depth '), write(Dnew), writeln('...'),
     provesIDS(Premises, Line, New, Dnew).
 
 % provesWrap/3 reverses the premises,
