@@ -1,22 +1,15 @@
-:- consult('parse_formulas.pl'), consult('parse_justifications.pl').
+% load the different parsing "modules"
+:-  consult('parse_formulas.pl'), 
+    consult('parse_justifications.pl'),
+    consult('parse_citations.pl').
+
+% don't display escape sequences when printing
 :- set_prolog_flag(answer_write_options,
                     [ quoted(true),
                       portray(true),
                       spacing(next_argument),
                       character_escapes(false)
                     ]).
-
-stringCit(0, "") :- !.
-
-stringCit(Cit, String) :-
-    number(Cit),
-    string_concat(": ", Cit, String), !.
-
-stringCit(two(X, Y), String) :-
-    atomics_to_string([": ", X, ", ", Y], "", String).
-
-stringCit(sub(X, Y), String) :-
-    atomics_to_string([": ", X, "--", Y], "", String).
 
 % return the code for one line in String
 oneLine(Line, String) :-
