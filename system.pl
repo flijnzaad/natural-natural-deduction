@@ -1,4 +1,4 @@
-% version 2.1
+% version 2.2
 
 % This makes sure that answers are never abbreviated with "..."
 :- set_prolog_flag(answer_write_options,
@@ -9,7 +9,7 @@
 
 currentLineNumber([], 0).
 
-currentLineNumber(line(_, _, _), 1).
+currentLineNumber(line(_, _, _, _), 1).
 
 currentLineNumber([H|T], N) :-
     currentLineNumber(H, A),
@@ -21,78 +21,78 @@ nextLineNumber(L, N) :-
     N is Current + 1.
 
 % contradiction introduction:
-proves(Premises, line(Next, contra, contraIntro), [line(Next, contra, contraIntro)|Premises], _) :-
-    member(line(_, X, _), Premises),
-    member(line(_, neg(X), _), Premises),
+proves(Premises, line(Next, contra, contraIntro, two(N1, N2)), [line(Next, contra, contraIntro, two(N1, N2))|Premises], _) :-
+    member(line(N1, X, _, _), Premises),
+    member(line(N2, neg(X), _, _), Premises),
     nextLineNumber(Premises, Next).
 
 % contradiction elimination:
-proves(Premises, line(Next, X, contraElim), [line(Next, X, contraElim)|Premises], _) :-
-    member(line(_, contra, _), Premises),
+proves(Premises, line(Next, X, contraElim, N), [line(Next, X, contraElim, N)|Premises], _) :-
+    member(line(N, contra, _, _), Premises),
     nextLineNumber(Premises, Next).
 
 % conjunction elimination:
-proves(Premises, line(Next, X, conjElim), [line(Next, X, conjElim)|Premises], _) :-
-    member(line(_, and(X,_), _), Premises),
+proves(Premises, line(Next, X, conjElim, N), [line(Next, X, conjElim, N)|Premises], _) :-
+    member(line(N, and(X,_), _, _), Premises),
     nextLineNumber(Premises, Next).
 
-proves(Premises, line(Next, Y, conjElim), [line(Next, Y, conjElim)|Premises], _) :-
-    member(line(_, and(_,Y), _), Premises),
+proves(Premises, line(Next, Y, conjElim, N), [line(Next, Y, conjElim, N)|Premises], _) :-
+    member(line(N, and(_,Y), _, _), Premises),
     nextLineNumber(Premises, Next).
 
 % conjunction introduction:
-proves(Premises, line(Next, and(X, Y), conjIntro), [line(Next, and(X,Y), conjIntro)|Premises], _) :-
-    member(line(_, X, _), Premises),
-    member(line(_, Y, _), Premises),
+proves(Premises, line(Next, and(X, Y), conjIntro, two(N1, N2)), [line(Next, and(X,Y), conjIntro, two(N1, N2))|Premises], _) :-
+    member(line(N1, X, _, _), Premises),
+    member(line(N2, Y, _, _), Premises),
     nextLineNumber(Premises, Next).
 
 % disjunction introduction:
-proves(Premises, line(Next, or(X, Y), disjIntro), [line(Next, or(X, Y), disjIntro)|Premises], _) :-
-    member(line(_, X, _), Premises),
+proves(Premises, line(Next, or(X, Y), disjIntro, N), [line(Next, or(X, Y), disjIntro, N)|Premises], _) :-
+    member(line(N, X, _, _), Premises),
     nextLineNumber(Premises, Next).
 
-proves(Premises, line(Next, or(X, Y), disjIntro), [line(Next, or(X, Y), disjIntro)|Premises], _) :-
-    member(line(_, Y, _), Premises),
+proves(Premises, line(Next, or(X, Y), disjIntro, N), [line(Next, or(X, Y), disjIntro, N)|Premises], _) :-
+    member(line(N, Y, _, _), Premises),
     nextLineNumber(Premises, Next).
 
 % implication elimination:
-proves(Premises, line(Next, Y, impElim), [line(Next, Y, impElim)|Premises], _) :-
-    member(line(_, if(X, Y), _), Premises),
-    member(line(_, X, _), Premises),
+proves(Premises, line(Next, Y, impElim, two(N1, N2)), [line(Next, Y, impElim, two(N1, N2))|Premises], _) :-
+    member(line(N1, if(X, Y), _, _), Premises),
+    member(line(N2, X, _, _), Premises),
     nextLineNumber(Premises, Next).
 
 % bi-implication elimination:
-proves(Premises, line(Next, Y, biimpElim), [line(Next, Y, biimpElim)|Premises], _) :-
-    member(line(_, iff(X, Y), _), Premises),
-    member(line(_, X, _), Premises),
+proves(Premises, line(Next, Y, biimpElim, two(N1, N2)), [line(Next, Y, biimpElim, two(N1, N2))|Premises], _) :-
+    member(line(N1, iff(X, Y), _, _), Premises),
+    member(line(N2, X, _, _), Premises),
     nextLineNumber(Premises, Next).
 
-proves(Premises, line(Next, X, biimpElim), [line(Next, X, biimpElim)|Premises], _) :-
-    member(line(_, iff(X, Y), _), Premises),
-    member(line(_, Y, _), Premises),
+proves(Premises, line(Next, X, biimpElim, two(N1, N2)), [line(Next, X, biimpElim, two(N1, N2))|Premises], _) :-
+    member(line(N1, iff(X, Y), _, _), Premises),
+    member(line(N2, X, _, _), Premises),
     nextLineNumber(Premises, Next).
 
 % negation elimination:
-proves(Premises, line(Next, X, negElim), [line(Next, X, negElim)|Premises], _) :-
-    member(line(_, neg(neg(X)), _), Premises),
+proves(Premises, line(Next, X, negElim, N), [line(Next, X, negElim, N)|Premises], _) :-
+    member(line(N, neg(neg(X)), _, _,), Premises),
     nextLineNumber(Premises, Next).
 
 % reiteration:
-proves(Premises, line(Next, X, reit), [line(Next, X, reit)|Premises], _) :-
-    member(line(_, X, _), Premises),
+proves(Premises, line(Next, X, reit, N), [line(Next, X, reit, N)|Premises], _) :-
+    member(line(N, X, _, _), Premises),
     nextLineNumber(Premises, Next).
 
 % transitivity:
-proves(Premises, line(_, X, JustX), End, D) :-
+proves(Premises, line(_, X, JustX, _), End, D) :-
     % don't exceed the current depth D
     length(Premises, N),
     N =< D,
     % derive 1 line from the premises
-    proves(Premises, line(_, Y, _), New, D),
+    proves(Premises, line(_, Y, _, _), New, D),
     % don't prove lines you already have (heuristic)
-    \+ member(line(_, Y, _), Premises),
+    \+ member(line(_, Y, _, _), Premises),
     % with this step added to the premises, derive line X
-    proves(New, line(_, X, JustX), End, D), !.
+    proves(New, line(_, X, JustX, _), End, D), !.
 
 % try to prove Line at the current depth
 provesIDS(Premises, Line, New, D) :-
