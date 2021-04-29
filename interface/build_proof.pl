@@ -8,7 +8,7 @@
 
 % return the code for one line in String
 oneLine(Formula, Justification, String) :-
-    stringForm(Formula, F),
+    stringFormula(Formula, F),
     stringJust(Justification, J),
     atomics_to_string(["    &", F, "&", J], " ", String).
 

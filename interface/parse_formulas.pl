@@ -29,3 +29,7 @@ stringForm(Formula, String) :-
     % concatenate the two strings with the connective in between,
     % surrounded by disambiguating parentheses
     atomics_to_string(["(", StringX, Connective, StringY, ")"], " ", String).
+
+stringFormula(Formula, String) :-
+    stringForm(Formula, StringMath),
+    atomics_to_string(["$", StringMath, "$"], "", String).

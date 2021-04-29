@@ -1,9 +1,9 @@
-stringCon("conj", "\\land").
-stringCon("disj", "\\lor").
-stringCon("neg", "\\lnot").
-stringCon("imp", "\\lif").
-stringCon("biimp", "\\liff").
-stringCon("contra", "\\lfalse").
+stringCon("conj",   "$\\land$").
+stringCon("disj",   "$\\lor$").
+stringCon("neg",    "$\\lnot$").
+stringCon("imp",    "$\\lif$").
+stringCon("biimp",  "$\\liff$").
+stringCon("contra", "$\\lfalse$").
 
 stringJust(premise, "") :- !.
 stringJust(reit, "Reit") :- !.
