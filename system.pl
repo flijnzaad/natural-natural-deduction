@@ -1,4 +1,4 @@
-% version 3.0
+% version 3.1
 
 % This makes sure that answers are never abbreviated with "..."
 :- set_prolog_flag(answer_write_options,
@@ -7,6 +7,7 @@
                       spacing(next_argument)
                     ]).
 
+% calculate the current line number of the list of proof lines
 currentLineNumber([], 0).
 
 currentLineNumber(line(_, _, _, _), 1).
@@ -16,6 +17,7 @@ currentLineNumber([H|T], N) :-
     currentLineNumber(T, B),
     N is A + B.
 
+% calculate the next line number of the list of proof lines
 nextLineNumber(L, N) :-
     currentLineNumber(L, Current),
     N is Current + 1.
@@ -93,6 +95,23 @@ proves(Premises, Line, [Line|Premises], _) :-
     Line = line(Next, X, reit, N),
     member(line(N, X, _, _), Premises),
     nextLineNumber(Premises, Next).
+
+% implication introduction
+proves(ProofLines, Available, Line, End, D) :-
+    Line    = line(Next, if(X, Y), impIntro, sub(N1, N2)),
+    % the premise and conclusion of the subproof
+    Premise = [line(N1, X, premise, 0)],
+    % TODO: I don't know if this will leave N2 uninstantiated;
+    % probably not though
+    Concl   = line(N2, Y, _, _),
+    append(Premise, Available, New),
+    % prove the subproof, the full proof is unified with Subproof
+    provesWrap(Premise, New, Concl, Subproof),
+    % add the Subproof and Line to the previous lines to get End
+    End  = [Line|[Subproof|ProofLines]],
+    % calculate the line numbers
+    nextLineNumber(ProofLines, N1),
+    nextLineNumber([Subproof|ProofLines], Next).
 
 % transitivity:
 proves(Premises, line(_, X, JustX, _), End, D) :-
