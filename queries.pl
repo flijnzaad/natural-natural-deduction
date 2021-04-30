@@ -103,3 +103,19 @@ q18(X) :-
     Premises = [line(1, q, premise, 0)],
     Concl    = line(_, if(p, q), _, _),
     provesWrap(Premises, Concl, X).
+
+q19(X) :-
+    Premises = [line(1, if(p, q), premise, 0),
+                line(2, if(q, r), premise, 0)],
+    Concl    = line(_, if(p, r), _, _),
+    provesWrap(Premises, Concl, X).
+
+q20(X) :-
+    Premises = [line(1, if(or(p, q), r), premise, 0)],
+    Concl    = line(_, if(p, r), _, _),
+    provesWrap(Premises, Concl, X).
+
+q21(X) :-
+    Premises = [line(1, if(or(p, q), r), premise, 0)],
+    Concl    = line(_, and(if(p, r), if(q, r)), _, _),
+    provesWrap(Premises, Concl, X).
