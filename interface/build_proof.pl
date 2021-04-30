@@ -13,18 +13,30 @@
 
 % return the code for one line in String
 oneLine(Line, String) :-
-    Line = line(N, Formula, Justification, Citation),
+    Line = line(N, Formula, Justification, Citation), !,
     stringFormula(Formula, F),
     stringJust(Justification, J),
     stringCit(Citation, C),
     atomics_to_string(["    & ", N, ". ", F, " & ", J, C], "", String).
 
+% build the subproof using buildProof
+oneLine(Line, String) :-
+    is_list(Line), !,
+    buildProof(Line, String).
+
 % base case for building the last premise
 buildPremises([H|T], T, Build, String) :-
-    oneLine(H, Line),
-    atomics_to_string([Build, Line, "\n"], "", String),
     T = [line(_, _, Just, _)|_],
-    Just \= premise, !.
+    Just \= premise, !,
+    oneLine(H, Line),
+    atomics_to_string([Build, Line, "\n}{\n"], "", String).
+
+% base case for building the last premise
+buildPremises(Lines, Lines, Build, Build) :-
+    Lines = [H|[Subproof|T]],
+    is_list(Subproof), !,
+    oneLine(H, Line),
+    atomics_to_string([Build, "\n}{\n", Line], "", String).
 
 % recursive case for building premises
 buildPremises([H|T], Rest, Build, String) :-
@@ -35,7 +47,7 @@ buildPremises([H|T], Rest, Build, String) :-
 % base case for building normal lines
 buildLines([H|[]], Build, String) :-
     oneLine(H, Line),
-    atomics_to_string([Build, Line, "\n"], "", String), !.
+    atomics_to_string([Build, Line, "\n}\n"], "", String), !.
 
 % recursive case for building normal lines
 buildLines([H|T], Build, String) :-
@@ -44,6 +56,6 @@ buildLines([H|T], Build, String) :-
     buildLines(T, String1, String).
 
 buildProof(Lines, String) :-
-    buildPremises(Lines, Rest, "", String1),
-    buildLines(Rest, "", String2),
-    atomics_to_string(["\n\\fitch{\n", String1, "}{\n", String2, "}\n"], "", String).
+    buildPremises(Lines, Rest, "", String1), % start with empty string
+    buildLines(Rest, "", String2),           % idem
+    atomics_to_string(["\n\\fitch{\n", String1, String2], "", String).
