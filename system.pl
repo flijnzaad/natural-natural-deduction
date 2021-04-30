@@ -1,4 +1,4 @@
-% version 3.1
+% version 3.2
 
 % This makes sure that answers are never abbreviated with "..."
 :- set_prolog_flag(answer_write_options,
@@ -116,7 +116,7 @@ proves(ProofLines, Available, Line, End, D) :-
 % transitivity:
 proves(Premises, line(_, X, JustX, _), End, D) :-
     % don't exceed the current depth D
-    length(Premises, N),
+    currentLineNumber(Premises, N),
     N =< D,
     % derive 1 line from the premises
     proves(Premises, line(_, Y, _, _), New, D),
@@ -143,7 +143,7 @@ provesIDS(Premises, Line, New, D) :-
 provesWrap(Premises, Conclusion, X) :-
     reverse(Premises, P),
     % initial proof depth: number of premises
-    length(Premises, N),
+    nextLineNumber(Premises, N),
     provesIDS(P, Conclusion, Y, N),
     % newline for neat progress printing
     reverse(Y, X), nl.
