@@ -9,11 +9,20 @@ pl.consult("../system.pl")      # load the relevant knowledge bases
 pl.consult("../queries.pl")
 pl.consult("build_proof.pl")
 
+# remove the .aux and .log files produced by the LaTeX compilation
+def clean_auxiliary_files(name):
+    # TODO: maybe this is also OS-specific
+    if os.path.exists(name + ".aux"):
+        os.remove(name + ".aux")
+    if os.path.exists(name + ".log"):
+        os.remove(name + ".log")
+
 # compile and open a LaTeX pdf
 def compile_open_pdf(name):
-    # TODO: maybe this command is also OS-specific
+    # TODO: maybe this is also OS-specific
     compile_command = 'pdflatex ' + name + '.tex'
     os.system(compile_command)
+    clean_auxiliary_files(name)
 
     pdf_name = name + '.pdf'
     if platform.system() == 'Darwin':           # macOS
@@ -22,13 +31,6 @@ def compile_open_pdf(name):
         os.startfile(pdf_name)
     else:                                       # linux variants
         subprocess.call(('xdg-open', pdf_name))
-
-# remove the .aux and .log files produced by the LaTeX compilation
-def clean_auxiliary_files():
-    if os.path.exists("*.aux"):
-        os.remove("*.aux")
-    if os.path.exists("*.log"):
-        os.remove("*.log")
 
 # returns a string that contains proof i
 def get_proof(i, labeled):
@@ -89,24 +91,42 @@ def print_version():
         print(line[2:-1]) # remove "% " at start and trailing \n
     sys.exit(0)
 
+# remove all tex proofs and compiled documents
+def remove_all():
+    # TODO: maybe this is also OS-specific
+    if os.path.exists("q*"):
+        os.remove("q*")
+    sys.exit(0)
+
+def get_last_query_no():
+    with open('../queries.pl', 'r') as file:
+        for line in reversed(list(file)):
+            print(line.rstrip())
+    return 22
+
 def main(arg):
     # TODO: add clipboard functionality
     # build_full_document((18,20), get_proof_range(18, 20, True))
     # compile_open_pdf(get_filename((18,20)))
     # usage()
     short_options = "q:r:a"
-    long_options  = ["tex", "nolabel", "version", "help"]
+    long_options  = ["tex", "nolabel", "version", "help", "remove"]
     try:
         opts, _ = getopt.getopt(arg, short_options, long_options)
+        # defaults
         labeled = True
         only_tex = False
-        numbers = 1
+        numbers = get_last_query_no()
+        # TODO: make switch?
         for option, argument in opts:
             if option == '--help':
                 print_usage()
             if option == '--version':
                 print_version()
+            if option == '--remove':
+                remove_all()
             if option == '-a':
+                get_last_query_no()
                 numbers = (1, 22)
             if option == '-q':
                 numbers = int(argument)
@@ -117,18 +137,26 @@ def main(arg):
                 only_tex = True
             if option == '--nolabel': 
                 labeled = False
+        if int(numbers):
+            proofs = get_proof(numbers, labeled)
+        else:
+            proofs = get_proof_range(numbers, labeled)
         if only_tex:
-            build_only_proofs
+            build_only_proofs(numbers, proofs)
+        else:
+            build_full_document(numbers, proofs)
+            compile_open_pdf(get_filename(numbers))
 
     except:
         # if no valid options are passed, print error message
         # and usage information
         # TODO: make more elaborate with the offending option
-        print("Unknown option used")
+        print("Unknown option used", arg)
         print_usage()
 
 # TODO: use pdflatex quiet mode and instead print progress messages to
 # the terminal
+# TODO: split this up into multiple files (i.e. util etc)
 
 # handle KeyboardInterrupts
 if __name__ == '__main__':
