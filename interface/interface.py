@@ -3,6 +3,7 @@ pl = Prolog()
 import os, subprocess, platform # compiling and opening a LaTeX pdf
 import sys                      # handling KeyboardInterrupts
 import shutil                   # copying the 'preamble.tex' file
+import getopt                   # handling command line arguments
 
 pl.consult("../system.pl")      # load the relevant knowledge bases
 pl.consult("../queries.pl")
@@ -77,7 +78,8 @@ def build_full_document(numbers, proofs):
 
 # display usage information
 def usage():
-    print("This should display the usage information")
+    with open('usage.txt', 'r') as file:
+        print(file.read(), end='') # no newline at end
     sys.exit(0)
 
 # print version information
@@ -88,8 +90,9 @@ def version():
 
 def main():
     # TODO: handle the argument options here
-    build_full_document((18,20), get_proof_range(18, 20, True))
-    compile_open_pdf(get_filename((18,20)))
+    # build_full_document((18,20), get_proof_range(18, 20, True))
+    # compile_open_pdf(get_filename((18,20)))
+    usage()
 
 # TODO: use pdflatex quiet mode and instead print progress messages to
 # the terminal
