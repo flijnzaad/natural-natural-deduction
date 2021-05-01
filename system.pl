@@ -1,4 +1,4 @@
-% version 3.7
+% version 3.8
 
 % This makes sure that answers are never abbreviated with "..."
 :- set_prolog_flag(answer_write_options,
@@ -22,6 +22,18 @@ currentLineNumber([H|T], N) :-
 nextLineNumber(L, N) :-
     currentLineNumber(L, Current),
     N is Current + 1.
+
+% prove a subproof
+subproof(ProofLines, Available, Line, End, NewA, Premise, Concl, Next, N1, N2) :-
+    % prove the subproof, the full proof is unified with Subproof
+    provesWrap([Premise], [Premise|Available], Concl, Subproof),
+    % add the Subproof and Line to the previous lines to get End
+    End  = [Line|[Subproof|ProofLines]],
+    NewA = [Line|[Subproof|Available]],
+    % calculate the line numbers
+    nextLineNumber(Available, N1),
+    nextLineNumber([Subproof|ProofLines], Next),
+    N2 is Next - 1.
 
 % contradiction introduction:
 proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], _) :-
@@ -97,21 +109,27 @@ proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], _) :-
     member(line(N, X, _, _), Available),
     nextLineNumber(Available, Next).
 
+%%% subproof rules
+
 % implication introduction
-proves(ProofLines, Available, Line, End, NewAvailable, _) :-
+proves(ProofLines, Available, Line, End, NewA, _) :-
     Line    = line(Next, if(X, Y), impIntro, sub(N1, N2)),
     % the premise and conclusion of the subproof
     Premise = line(N1, X, premise, 0),
     Concl   = line(N2, Y, _, _),
-    % prove the subproof, the full proof is unified with Subproof
-    provesWrap([Premise], [Premise|Available], Concl, Subproof),
-    % add the Subproof and Line to the previous lines to get End
-    End          = [Line|[Subproof|ProofLines]],
-    NewAvailable = [Line|[Subproof|Available]],
-    % calculate the line numbers
-    nextLineNumber(Available, N1),
-    nextLineNumber([Subproof|ProofLines], Next),
-    N2 is Next - 1.
+    subproof(ProofLines, Available, Line, End, NewA,
+             Premise, Concl, Next, N1, N2).
+
+% negation introduction
+proves(ProofLines, Available, Line, End, NewA, _) :-
+    Line    = line(Next, neg(X), negIntro, sub(N1, N2)),
+    % the premise and conclusion of the subproof
+    Premise = line(N1, X, premise, 0),
+    Concl   = line(N2, contra, _, _),
+    subproof(ProofLines, Available, Line, End, NewA,
+             Premise, Concl, Next, N1, N2).
+
+%%%
 
 % transitivity:
 proves(ProofLines, Available, LineX, End, NewAvailable, MaxDepth) :-
