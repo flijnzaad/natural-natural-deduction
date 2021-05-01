@@ -25,6 +25,7 @@ oneLine(Line, String) :-
     buildProof(Line, String).
 
 % base case for building the last premise
+% when the next line is a regular line
 buildPremises([H|T], T, Build, String) :-
     T = [line(_, _, Just, _)|_],
     Just \= premise, !,
@@ -32,14 +33,17 @@ buildPremises([H|T], T, Build, String) :-
     atomics_to_string([Build, Line, "\n}{\n"], "", String).
 
 % base case for building the last premise
-buildPremises(Lines, Lines, Build, Build) :-
-    Lines = [H|[Subproof|T]],
+% when the next line is a subproof
+buildPremises(Lines, T, Build, String) :-
+    Lines = [H|T],
+    T = [Subproof|_],
     is_list(Subproof), !,
     oneLine(H, Line),
-    atomics_to_string([Build, "\n}{\n", Line], "", String).
+    atomics_to_string([Build, Line, "\n}{"], "", String).
 
 % recursive case for building premises
 buildPremises([H|T], Rest, Build, String) :-
+    compound(H), !,
     oneLine(H, Line),
     atomics_to_string([Build, Line, " \\\\ \n"], "", String1),
     buildPremises(T, Rest, String1, String).
