@@ -1,7 +1,7 @@
 from pyswip import Prolog       # querying our knowledge bases
 pl = Prolog()
 import os, subprocess, platform # compiling and opening a LaTeX pdf
-import sys                      # handling keyboardinterrupts
+import sys                      # handling KeyboardInterrupts
 import shutil                   # copying the 'preamble.tex' file
 
 pl.consult("../system.pl")      # load the relevant knowledge bases
@@ -22,6 +22,13 @@ def compile_open_pdf(name):
     else:                                       # linux variants
         subprocess.call(('xdg-open', pdf_name))
 
+# remove the .aux and .log files produced by the LaTeX compilation
+def clean_auxiliary_files():
+    if os.path.exists("*.aux"):
+        os.remove("*.aux")
+    if os.path.exists("*.log"):
+        os.remove("*.log")
+
 # returns a string that contains proof i
 def get_proof(i):
     query = "q" + str(i) + "(X), buildProof(X, S)"
@@ -30,13 +37,13 @@ def get_proof(i):
 
 # returns a string that contains the proofs in the given range
 def get_proofs(begin, end):
-    all = ""
+    text = ""
     for i in range(begin, end+1):
         query_name = "q" + str(i)
         print(query_name + ":")
         text += "\\paragraph{Proof " + str(i) + "}"
-        all += get_proof(i)
-    return all
+        text += get_proof(i)
+    return text
 
 # build a document with only the code of one proof
 def build_doc_proof(i):
@@ -54,8 +61,14 @@ def build_doc_complete(begin, end):
     with open('proofs.tex', 'a') as file:
         file.write(text)
 
+# print version information
+def version():
+    with open('../system.pl', 'r') as file:
+        line = file.readline()
+        print(line[2:-1]) # remove "% " at start and trailing \n
+
 def main():
-    # build_doc_complete(16, 20)
+    build_doc_complete(22, 22)
     # compile_open_pdf('proofs')
     build_doc_proof(19)
 
@@ -68,8 +81,3 @@ if __name__ == '__main__':
             sys.exit(0)
         except SystemExit:
             os._exit(0)
-
-# TODO: add commands that remove the aux and log files (comment it out because
-# of debugging purposes, you want to be able to view the .log file) 
-# TODO: add argument functionality: "--all" solves all proofs in tests.pl, an
-# integer argument only solves that numbered query
