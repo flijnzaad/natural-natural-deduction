@@ -21,6 +21,10 @@ main :-
     writeln('q15: '), q15(_15), writelines(_15), nl,
     writeln('q16: '), q16(_16), writelines(_16), nl,
     writeln('q17: '), q17(_17), writelines(_17), nl,
+    writeln('q18: '), q18(_18), writelines(_18), nl,
+    writeln('q19: '), q19(_19), writelines(_19), nl,
+    writeln('q20: '), q20(_20), writelines(_20), nl,
+    % writeln('q21: '), q21(_21), writelines(_21), nl,
     halt(0).
 
 writelines([]).
