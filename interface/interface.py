@@ -76,23 +76,56 @@ def build_full_document(numbers, proofs):
     with open(filename, 'a') as file:
         file.write(text)
 
-# display usage information
-def usage():
+# print usage information
+def print_usage():
     with open('usage.txt', 'r') as file:
         print(file.read(), end='') # no newline at end
     sys.exit(0)
 
 # print version information
-def version():
+def print_version():
     with open('../system.pl', 'r') as file:
         line = file.readline()
         print(line[2:-1]) # remove "% " at start and trailing \n
+    sys.exit(0)
 
-def main():
-    # TODO: handle the argument options here
+def main(arg):
+    # TODO: add clipboard functionality
     # build_full_document((18,20), get_proof_range(18, 20, True))
     # compile_open_pdf(get_filename((18,20)))
-    usage()
+    # usage()
+    short_options = "q:r:a"
+    long_options  = ["tex", "nolabel", "version", "help"]
+    try:
+        opts, _ = getopt.getopt(arg, short_options, long_options)
+        labeled = True
+        only_tex = False
+        numbers = 1
+        for option, argument in opts:
+            if option == '--help':
+                print_usage()
+            if option == '--version':
+                print_version()
+            if option == '-a':
+                numbers = (1, 22)
+            if option == '-q':
+                numbers = int(argument)
+            if option == '-r':
+                num = argument.split(',')
+                numbers = (int(num[0]), int(num[1]))
+            if option == '--tex':
+                only_tex = True
+            if option == '--nolabel': 
+                labeled = False
+        if only_tex:
+            build_only_proofs
+
+    except:
+        # if no valid options are passed, print error message
+        # and usage information
+        # TODO: make more elaborate with the offending option
+        print("Unknown option used")
+        print_usage()
 
 # TODO: use pdflatex quiet mode and instead print progress messages to
 # the terminal
@@ -100,7 +133,7 @@ def main():
 # handle KeyboardInterrupts
 if __name__ == '__main__':
     try:
-        main()
+        main(sys.argv[1:])
     except KeyboardInterrupt:
         print('Interrupted')
         try:
