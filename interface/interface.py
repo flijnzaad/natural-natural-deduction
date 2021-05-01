@@ -10,6 +10,8 @@ pl.consult("../system.pl")      # load the relevant knowledge bases
 pl.consult("../queries.pl")
 pl.consult("build_proof.pl")
 
+USER_MODE = True                # debug constant
+
 # remove the .aux and .log files produced by the LaTeX compilation
 def clean_auxiliary_files(name):
     # TODO: maybe this is also OS-specific
@@ -21,7 +23,10 @@ def clean_auxiliary_files(name):
 # compile and open a LaTeX pdf
 def compile_open_pdf(name):
     # TODO: maybe this is also OS-specific
-    compile_command = 'pdflatex ' + name + '.tex'
+    compile_command = 'pdflatex ' + name + '.tex' 
+    if USER_MODE: 
+        # TODO: and this too
+        compile_command += ' -interaction=batchmode 2>&1 > /dev/null'
     os.system(compile_command)
     clean_auxiliary_files(name)
 
