@@ -12,8 +12,10 @@ Usage:
                                Display the system's version
 
 Options:
-    --tex       Only produce a tex file without preamble and labeled queries,
-                don't compile or open pdf
-    --all       Solve all queries in queries.pl
-    -q i        Solve only query number i
-    -q i j      Solve queries i until and including j
+    --tex           Only produce a tex file without preamble or labeled 
+                    queries, don't compile or open pdf
+    --clip          Same as --tex, but copy this tex file to the clipboard
+    --nolabel       Don't add labels to the queries
+    --all           Solve all queries in queries.pl
+    -q i            Solve only query number i
+    -q i j          Solve queries i until and including j
