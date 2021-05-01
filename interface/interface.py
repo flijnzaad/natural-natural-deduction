@@ -48,22 +48,31 @@ def get_proof_range(begin, end, labeled):
         text += get_proof(i, labeled)
     return text
 
+# return filename with the query number(s)
+def get_filename(numbers):
+    if type(numbers) == int:
+        num = str(numbers) 
+    else:
+        num = str(numbers[0]) + '-' + str(numbers[1])
+    return 'q' + str(num)
+
+def get_tex_name(numbers):
+    return get_filename(numbers) + '.tex'
+
 # build a document with only the code of proofs
 def build_only_proofs(numbers, proofs):
-    # TODO: change filename
-    filename = "q" + str(numbers) + '.tex'
-    with open(filename, 'w') as file:
+    with open(get_tex_name(numbers), 'w') as file:
         file.write(proofs)
-    print("Succesfully made a proof for q" + str(i) + ", to be found in " +
-            filename)
+    print("Succesfully made a proof for " + get_filename(numbers) 
+          + ", to be found in " + get_tex_name(numbers))
 
-# build a document with the code of proofs, add the preamble and surround
+# build a tex file with the code of proofs: add the preamble and surround
 # with begin/end document
-def build_full_document(proofs):
-    # TODO: change filename
-    shutil.copy('preamble.tex', 'proofs.tex')
+def build_full_document(numbers, proofs):
+    filename = get_tex_name(numbers)
+    shutil.copy('preamble.tex', filename)
     text = '\n\\begin{document}\n' + proofs + '\n\\end{document}\n'
-    with open('proofs.tex', 'a') as file:
+    with open(filename, 'a') as file:
         file.write(text)
 
 # display usage information
@@ -79,9 +88,13 @@ def version():
 
 def main():
     # TODO: handle the argument options here
-    build_only_proofs(18, get_proof_range(18, 20, False))
-    compile_open_pdf('proofs')
+    build_full_document((18,20), get_proof_range(18, 20, True))
+    compile_open_pdf(get_filename((18,20)))
 
+# TODO: use pdflatex quiet mode and instead print progress messages to
+# the terminal
+
+# handle KeyboardInterrupts
 if __name__ == '__main__':
     try:
         main()
