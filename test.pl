@@ -27,12 +27,24 @@ main :-
     % writeln('q21: '), q21(_21), writelines(_21), nl,
     halt(0).
 
-writelines([]).
+writelines([], _).
 
-writelines([H|T]) :-
-    H = line(N, A, J, C),
+% print a normal line
+writelines([H|T], Indent) :-
+    H = line(N, A, J, C), !,
+    tab(Indent),
+    write('|'), tab(1),
     write(N), tab(2),
     write(A), tab(4), 
     write(J), tab(4), 
     write(C), nl,
-    writelines(T).
+    writelines(T, Indent).
+
+writelines([H|T], Indent) :-
+    is_list(H), !,
+    NewIndent is Indent + 4,
+    writelines(H, NewIndent),
+    writelines(T, Indent).
+
+writelines(L) :-
+    writelines(L, 0).
