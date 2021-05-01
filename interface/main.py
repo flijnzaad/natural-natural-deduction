@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from utils import *
 from pyswip import Prolog       # querying our knowledge bases
 pl = Prolog()
@@ -18,7 +20,8 @@ def get_proof(i, labeled):
     return text
 
 # returns a string that contains the proofs in the given range
-def get_proof_range(begin, end, labeled):
+def get_proof_range(numbers, labeled):
+    begin, end = numbers
     text = ""
     for i in range(begin, end+1):
         # process printing to terminal
@@ -31,7 +34,7 @@ def get_proof_range(begin, end, labeled):
 def build_only_proofs(numbers, proofs):
     with open(get_tex_name(numbers), 'w') as file:
         file.write(proofs)
-    print("Succesfully made a proof for " + get_filename(numbers) 
+    print("Succesfully built a proof tex file for " + get_filename(numbers) 
           + ", to be found in " + get_tex_name(numbers))
 
 # build a tex file with the code of proofs: add the preamble and surround
@@ -42,6 +45,8 @@ def build_full_document(numbers, proofs):
     text = '\n\\begin{document}\n' + proofs + '\n\\end{document}\n'
     with open(filename, 'a') as file:
         file.write(text)
+    print("Succesfully built a proof tex file for " + get_filename(numbers) 
+          + ", to be found in " + get_tex_name(numbers))
 
 def main(arg):
     # TODO: add clipboard functionality
@@ -73,10 +78,11 @@ def main(arg):
                 only_tex = True
             if option == '--nolabel': 
                 labeled = False
-        if int(numbers):
+        if type(numbers) == int:
             proofs = get_proof(numbers, labeled)
         else:
             proofs = get_proof_range(numbers, labeled)
+        if USER_MODE: print("Succesfully solved all proofs")
         if only_tex:
             build_only_proofs(numbers, proofs)
         else:

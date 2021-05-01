@@ -20,9 +20,12 @@ def compile_open_pdf(name):
     if USER_MODE: 
         # TODO: and this too
         compile_command += ' -interaction=batchmode 2>&1 > /dev/null'
+    if USER_MODE: print("Compiling the pdf...")
     os.system(compile_command)
+    if USER_MODE: print("Removing auxiliary files...")
     clean_auxiliary_files(name)
     pdf_name = name + '.pdf'
+    if USER_MODE: print("Opening the pdf...")
     if platform.system() == 'Darwin':           # macOS
         subprocess.call(('open', pdf_name))
     elif platform.system() == 'Windows':        # Windows
