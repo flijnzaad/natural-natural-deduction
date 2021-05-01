@@ -1,9 +1,10 @@
-% version 3.5
+% version 3.6
 
 % This makes sure that answers are never abbreviated with "..."
 :- set_prolog_flag(answer_write_options,
                     [ quoted(true),
                       portray(true),
+                      character_escapes(false),
                       spacing(next_argument)
                     ]).
 
@@ -112,18 +113,20 @@ proves(ProofLines, Available, Line, End, _) :-
     N2 is Next - 1.
 
 % transitivity:
-proves(ProofLines, Available, line(_, X, JustX, _), End, D) :-
+proves(ProofLines, Available, LineX, End, MaxDepth) :-
+    LineX = line(_, _, _, _),
     % don't exceed the current depth D
-    currentLineNumber(ProofLines, N),
-    N =< D,
+    currentLineNumber(ProofLines, D),
+    D =< MaxDepth,
     % derive 1 line from the premises
-    proves(ProofLines, Available, line(Ln, Y, J, C), New, D),
+    proves(ProofLines, Available, LineY, New, MaxDepth),
+    LineY = line(_, Y, _, _),
     % don't prove lines you already have (heuristic)
     \+ member(line(_, Y, _, _), ProofLines),
-    NewAvailable = [line(Ln, Y, J, C)|Available],
+    NewAvailable = [LineY|Available],
+    write('NewAvailable: '), writeln(NewAvailable),
     % with this step added to the premises, derive line X
-    proves(New, NewAvailable, line(_, X, JustX, _), End, D), !,
-    writeln(End).
+    proves(New, NewAvailable, LineX, End, MaxDepth), !.
 
 % try to prove Line at the current depth
 provesIDS(Premises, Available, Line, New, D) :-
@@ -146,7 +149,7 @@ provesWrap(Premises, Available, Conclusion, X) :-
     currentLineNumber(Premises, D),
     provesIDS(P, Available, Conclusion, Y, D),
     % newline for neat progress printing
-    reverse(Y, X), nl.
+    reverse(Y, X).
 
 % if you don't have the Available argument, instantiate it with Premises
 provesWrap(Premises, Conclusion, X) :-
