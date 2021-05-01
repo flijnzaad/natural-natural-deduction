@@ -1,0 +1,26 @@
+\documentclass{article}
+\usepackage{amsmath,amssymb}
+
+%% logical symbols in the amsmath style: already have \land, \lor, \lnot
+\newcommand{\lif}{\rightarrow}      % implication
+\newcommand{\liff}{\leftrightarrow} % bi-implication
+\newcommand{\lfalse}{\bot}          % contradiction
+\newcommand{\lall}{\forall}         % universal quantification
+\newcommand{\lis}{\exists}          % existential quantification
+
+%%%% Provide a \fitch{...}{...} command for formal proofs
+\setbox0=\hbox{\begin{tabular}{r@{}|}\end{tabular}}
+\newlength\fitchone    \fitchone 6cm
+\newlength\fitchtwo    \fitchtwo 0pt
+\newlength\fitchthree  \fitchthree 0pt
+\advance\fitchthree by 10pt
+\newcommand{\fitch}[2]{\advance \fitchone by -\fitchthree%
+    \hspace*{.35em}%
+    \begin{tabular}[t]{|p{\fitchtwo}@{}p{\fitchone}@{\hspace{2em}}l}
+    \multicolumn{3}{@{}l@{}}{\ }\\[-2.35ex]
+    #1 \\
+    \ \\[-2.5ex] \cline{1-1}\\[-2ex] % draw short line after premises
+    #2 \\ \multicolumn{3}{@{}l@{}} \ \\[-2.35ex]
+    \end{tabular}
+    \advance \fitchone by \fitchthree%
+}

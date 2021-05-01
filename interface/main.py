@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 
-from utils import *
+from utils.utils import *
+import sys, getopt
 from pyswip import Prolog       # querying our knowledge bases
 pl = Prolog()
 
 pl.consult("../system.pl")      # load the relevant knowledge bases
 pl.consult("../queries.pl")
-pl.consult("build_proof.pl")
+pl.consult("utils/build_proof.pl")
 
 USER_MODE = True                # debug constant
+PREAMBLE_PATH = "utils/preamble.tex"
 
 # returns a string that contains proof i
 def get_proof(i, labeled):
@@ -41,7 +43,7 @@ def build_only_proofs(numbers, proofs):
 # with begin/end document
 def build_full_document(numbers, proofs):
     filename = get_tex_name(numbers)
-    shutil.copy('preamble.tex', filename)
+    shutil.copy(PREAMBLE_PATH, filename)
     text = '\n\\begin{document}\n' + proofs + '\n\\end{document}\n'
     with open(filename, 'a') as file:
         file.write(text)
@@ -51,7 +53,7 @@ def build_full_document(numbers, proofs):
 def main(arg):
     # TODO: add clipboard functionality
     short_options = "q:r:a"
-    long_options  = ["tex", "nolabel", "version", "help", "remove"]
+    long_options  = ["tex", "nolabel", "version", "help", "clean"]
     try:
         opts, _ = getopt.getopt(arg, short_options, long_options)
         # defaults
@@ -64,7 +66,7 @@ def main(arg):
                 print_usage()
             if option == '--version':
                 print_version()
-            if option == '--remove':
+            if option == '--clean':
                 remove_all()
             if option == '-a':
                 get_last_query_no()
@@ -82,7 +84,7 @@ def main(arg):
             proofs = get_proof(numbers, labeled)
         else:
             proofs = get_proof_range(numbers, labeled)
-        if USER_MODE: print("Succesfully solved all proofs")
+        if USER_MODE: print("Succesfully solved the proof(s)")
         if only_tex:
             build_only_proofs(numbers, proofs)
         else:
@@ -103,7 +105,7 @@ def main(arg):
 # handle KeyboardInterrupts
 if __name__ == '__main__':
     try:
-        main(sys.argv[1:])
+        main(sys.argv)
     except KeyboardInterrupt:
         print('Interrupted')
         try:
