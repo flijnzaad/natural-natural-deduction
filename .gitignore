@@ -134,6 +134,5 @@ interface/*.aux
 interface/*.log
 interface/*.pdf
 interface/*.tex
-# but make an exception for the preamble, and flowchart pdf
+# but make an exception for the preamble
 !interface/preamble.tex
-!interface/interface_flowchart.pdf
