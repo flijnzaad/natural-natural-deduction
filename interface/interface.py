@@ -4,6 +4,7 @@ import os, subprocess, platform # compiling and opening a LaTeX pdf
 import sys                      # handling KeyboardInterrupts
 import shutil                   # copying the 'preamble.tex' file
 import getopt                   # handling command line arguments
+import re                       # regular expressions
 
 pl.consult("../system.pl")      # load the relevant knowledge bases
 pl.consult("../queries.pl")
@@ -94,21 +95,24 @@ def print_version():
 # remove all tex proofs and compiled documents
 def remove_all():
     # TODO: maybe this is also OS-specific
-    if os.path.exists("q*"):
-        os.remove("q*")
+    files = os.listdir()
+    for file in files:
+        if file.startswith("q"):
+            os.remove(file)
+            print("Removed", file)
     sys.exit(0)
 
+# get the last query number from the queries.pl file
 def get_last_query_no():
     with open('../queries.pl', 'r') as file:
         for line in reversed(list(file)):
-            print(line.rstrip())
-    return 22
+            match = re.match("q([0-9]+)\(X\) :-", line)
+            if match: break
+    n = match.groups()[0]
+    return int(n)
 
 def main(arg):
     # TODO: add clipboard functionality
-    # build_full_document((18,20), get_proof_range(18, 20, True))
-    # compile_open_pdf(get_filename((18,20)))
-    # usage()
     short_options = "q:r:a"
     long_options  = ["tex", "nolabel", "version", "help", "remove"]
     try:
@@ -127,7 +131,7 @@ def main(arg):
                 remove_all()
             if option == '-a':
                 get_last_query_no()
-                numbers = (1, 22)
+                numbers = (1, get_last_query_no())
             if option == '-q':
                 numbers = int(argument)
             if option == '-r':
@@ -147,12 +151,12 @@ def main(arg):
             build_full_document(numbers, proofs)
             compile_open_pdf(get_filename(numbers))
 
-    except:
+    except getopt.GetoptError:
         # if no valid options are passed, print error message
         # and usage information
         # TODO: make more elaborate with the offending option
         print("Unknown option used", arg)
-        print_usage()
+        # print_usage()
 
 # TODO: use pdflatex quiet mode and instead print progress messages to
 # the terminal
