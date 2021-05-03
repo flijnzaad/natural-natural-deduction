@@ -23,8 +23,9 @@ def compile_open_pdf(name):
         compile_command += ' -interaction=batchmode 2>&1 > /dev/null'
     if USER_MODE: print("Compiling the pdf...")
     os.system(compile_command)
-    if USER_MODE: print("Removing auxiliary files...")
-    clean_auxiliary_files(name)
+    if USER_MODE: 
+        print("Removing auxiliary files...")
+        clean_auxiliary_files(name)
     pdf_name = name + '.pdf'
     if USER_MODE: print("Opening the pdf...")
     if platform.system() == 'Darwin':           # macOS
@@ -48,7 +49,7 @@ def print_version():
         print("System", line[2:-1])
     sys.exit(0)
 
-# remove all tex proofs and compiled documents
+# remove all tex proofs, compiled documents and auxiliary files
 def remove_all():
     # TODO: maybe this is also OS-specific
     files = os.listdir()
@@ -75,5 +76,11 @@ def get_filename(numbers):
         num = str(numbers[0]) + '-' + str(numbers[1])
     return 'q' + str(num)
 
+# return the filename plus tex extension
 def get_tex_name(numbers):
     return get_filename(numbers) + '.tex'
+
+# print a process message that states that a file has been built succesfully
+def print_built_msg(numbers):
+    print("Succesfully built a proof tex file for " + get_filename(numbers) 
+      + ", to be found in " + get_tex_name(numbers))

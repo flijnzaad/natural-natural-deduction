@@ -5,11 +5,11 @@ from pyswip import Prolog       # querying our knowledge bases
 pl = Prolog()
 
 USER_MODE     = True                  # debug constant
-PREAMBLE_PATH = "utils/preamble.tex"  # relevant paths
-SYSTEM_PATH   = "../system.pl"
+SYSTEM_PATH   = "../system.pl"        # relevant paths
 QUERIES_PATH  = "../queries.pl"
-USAGE_PATH    = "utils/usage.txt"
+PREAMBLE_PATH = "utils/preamble.tex"
 BUILD_PATH    = "utils/build_proof.pl"
+USAGE_PATH    = "utils/usage.txt"
 
 pl.consult(SYSTEM_PATH)      # load the relevant knowledge bases
 pl.consult(QUERIES_PATH)
@@ -39,8 +39,8 @@ def get_proof_range(numbers, labeled):
 def build_only_proofs(numbers, proofs):
     with open(get_tex_name(numbers), 'w') as file:
         file.write(proofs)
-    print("Succesfully built a proof tex file for " + get_filename(numbers) 
-          + ", to be found in " + get_tex_name(numbers))
+    if USER_MODE:
+        print_built_msg(numbers)
 
 # build a tex file with the code of proofs: add the preamble and surround
 # with begin/end document
@@ -50,20 +50,21 @@ def build_full_document(numbers, proofs):
     text = '\n\\begin{document}\n' + proofs + '\n\\end{document}\n'
     with open(filename, 'a') as file:
         file.write(text)
-    print("Succesfully built a proof tex file for " + get_filename(numbers) 
-          + ", to be found in " + get_tex_name(numbers))
+    if USER_MODE:
+        print_built_msg(numbers)
 
 def main(arg):
     # TODO: add clipboard functionality
     short_options = "q:r:a"
-    long_options  = ["tex", "nolabel", "version", "help", "clean"]
+    long_options  = ["tex", "nolabel", "version", "help", "clean", "clip"]
+
     try:
         opts, _ = getopt.getopt(arg, short_options, long_options)
         # defaults
         labeled = True
         only_tex = False
         numbers = get_last_query_no()
-        # TODO: make switch?
+
         for option, argument in opts:
             if option == '--help':
                 print_usage()
@@ -82,13 +83,17 @@ def main(arg):
             if option == '--tex':
                 only_tex = True
                 labeled  = False
+            if option == '--clip':
+                print("This option has yet to be implemented. Using default options")
             if option == '--nolabel': 
                 labeled = False
+
         if type(numbers) == int:
             proofs = get_proof(numbers, labeled)
         else:
             proofs = get_proof_range(numbers, labeled)
         if USER_MODE: print("Succesfully solved the proof(s)")
+
         if only_tex:
             build_only_proofs(numbers, proofs)
         else:
@@ -96,8 +101,7 @@ def main(arg):
             compile_open_pdf(get_filename(numbers))
 
     except getopt.GetoptError as error:
-        # if no valid options are passed, print error message
-        # and usage information
+        # if an invalid option is passed, print error message and usage info
         print("Error:", error)
         print_usage()
 
