@@ -1,16 +1,16 @@
 Usage: 
-    1) python3 main.py
+    1) ./main.py
                                Solve all queries; produce a tex file including
                                preamble and labeled queries; compile the tex 
                                file and open the pdf
-    2) python3 main.py [options]
+    2) ./main.py [options]
                                Solve queries and produce/open files according
                                to the options
-    3) python3 main.py --help
+    3) ./main.py --help
                                Display this message
-    4) python3 main.py --version
+    4) ./main.py --version
                                Display the system's version
-    5) python3 main.py --clean
+    5) ./main.py --clean
                                Remove all proof tex and pdf files
 
 Options:
