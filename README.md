@@ -6,27 +6,33 @@ Repository for the Natural Natural Deduction system: a theorem prover for propos
 * [Python](https://www.python.org/) version >= 3.8.5 for file operations
 * [pdflatex/TeX Live 2020](https://tug.org/texlive/) for compiling a LaTeX document
 
-## Running via interfacing
-* To run all available test queries and produce a LaTeX document of them, `cd` to the `interface` directory and run `python3 interface.py`. The system will print some progress statements and open a compiled PDF.
+## Install
+```
+git clone https://github.com/flijnzaad/bachelor-project.git natural-deduction
+cd natural-deduction
+chmod +x test.pl interface/main.py
+```
 
-## Running `system.pl`
+## Running the interface
+* `cd` to the `interface` directory and run `./main.py`. See `./main.py --help` for more information and options.
+
+## Running the system within Prolog
 ### Starting, stopping and loading the system
 * You can load the system by passing the program to the Prolog interpreter (`prolog` and `swipl` are equivalent commands) directly:
 
-      $ prolog system.pl
+      $ prolog system.pl queries.pl
 
-* Within the Prolog interpreter, you can (re)load the system using `make/0`:
+* Within the Prolog interpreter, you can load the knowledge bases using `make/0`:
 
       ?- make.
 
     * `make/0` consults all source files that have been changed since they were consulted.
-    * If you started the interpreter without arguments (i.e. just `prolog`), you first need to load the knowledge base using `[system].` before you can use `make.`.
-* To load the testing queries:
+    * If you started the interpreter without arguments (i.e. just `prolog`), you first need to load the knowledge bases using `[system].` and `[queries].` before you can use `make.`.
+* To test all queries at once:
 
-      ?- [tests].
+      $ prolog test.pl
 
-    * `tests.pl` by default halts once all queries have been handled. If you want to stay in the interpreter, press <kbd>Ctrl</kbd> + <kbd>C</kbd> and then <kbd>a</kbd> to stop execution and abort.
-
+    * This will exit the Prolog interpreter if it has succesfully executed all goals.
 * The Prolog interpreter can be stopped with <kbd>Ctrl</kbd> + <kbd>D</kbd>, or by typing:
 
       ?- halt.
@@ -81,8 +87,10 @@ The line number `N`, formula `F`, justification `J` and citation `C` of a proof 
 * The recursive case implements the transitivity of provability: `X` is provable from premises `P` if premises `P` can prove line `Y`, and premises `P` plus line `Y` can prove line `X`.
 
 ## The structure of the parsing system
-`system.pl` returns proofs in a Prolog list with the line functor that's described above. The parsing system has the following components, located in the `interface` directory:
+`system.pl` returns proofs in a Prolog list with the line functor that's described above. The parsing system has the following components, located in the `interface/utils` directory:
 * `parse_formulas.pl` contains the `stringFormula/2` predicate. When given a formula in Prolog format with prefix operators, this predicate will return the LaTeX code for this formula.
 * `parse_justifications.pl` contains the `stringJust/2` predicate. When given a justification in Prolog format, this predicate will return the LaTeX code for it.
-* `build_proof.pl` first of all 'consults' (loads) the above two programs. When given a proof in the Prolog format (i.e. a list of lines that use the `line` functor), it returns the LaTeX code for a full Fitch-style proof.
-* `interface.py` loads the system and `build_proof.pl`. It runs each of the testing queries in `tests.pl`, 'builds' their LaTeX code and combines this with the given preamble into a `proof.tex` file. Lastly, it compiles the tex file using `pdflatex` and opens the resulting pdf.
+* `parse_citations.pl` contains the `stringCit/2` predicate. When given a citation in Prolog format, this predicate will return the LaTeX code for it.
+* `build_proof.pl` first of all 'consults' (loads) the above three programs. When given a proof in the Prolog format (i.e. a list of lines that use the `line` functor), it returns the LaTeX code for a full Fitch-style proof.
+
+`main.py`, located in `interface`, loads the system and `build_proof.pl`. It runs queries in `queries.pl`, 'builds' their LaTeX code and possibly combines this with the given preamble into a tex file. Lastly, it compiles the tex file using `pdflatex` and opens the resulting pdf.
