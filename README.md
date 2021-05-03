@@ -58,25 +58,7 @@ chmod +x test.pl interface/main.py
 
 ## Predicates and functions of `system.pl`
 
-Propositional logic formulas are built up from the following constants and functions, which can be interpreted as prefix operators:
-
-* atomic constants i.e. lowercase letters `p`, `q`, `r`, etc.
-* special propositional atom `contra` for contradiction
-* unary operator: `neg(_)` (`not/1` is already defined in Prolog)
-* binary operators: `and(_, _)` for conjunction, `or(_, _)` for disjunction, `if(_, _)` for implication, `iff(_, _)` for bi-implication
-
-Justifications are as follows:
-* `[conj|disj|neg|imp|biimp|contra][Intro|Elim]` for the introduction and elimination rules
-* `premise` if the line is a premise
-* `reit` if the line is a reiteration
-
-Citing line numbers (experimental/for the future):
-* `0` if the line is a premise (of a subproof)
-* just the number if only 1 citation
-* `two(x, y)` if two steps `x`, `y` need to be cited
-* `sub(x, y)` if a subproof `x - y` needs to be cited
-
-The line number `N`, formula `F`, justification `J` and citation `C` of a proof line are combined in a functor `line(N, F, J, C)`.
+For more information on the system-specific syntax, see the report.
 
 `proves(X, Y, Z, D)`, where:
 * `X` is a list of the proof lines up until now;
