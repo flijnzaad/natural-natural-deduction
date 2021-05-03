@@ -1,16 +1,19 @@
 #!/usr/bin/env python3
 
 from utils.utils import *
-import sys, getopt
 from pyswip import Prolog       # querying our knowledge bases
 pl = Prolog()
 
-pl.consult("../system.pl")      # load the relevant knowledge bases
-pl.consult("../queries.pl")
-pl.consult("utils/build_proof.pl")
+USER_MODE     = True                  # debug constant
+PREAMBLE_PATH = "utils/preamble.tex"  # relevant paths
+SYSTEM_PATH   = "../system.pl"
+QUERIES_PATH  = "../queries.pl"
+USAGE_PATH    = "utils/usage.txt"
+BUILD_PATH    = "utils/build_proof.pl"
 
-USER_MODE = True                # debug constant
-PREAMBLE_PATH = "utils/preamble.tex"
+pl.consult(SYSTEM_PATH)      # load the relevant knowledge bases
+pl.consult(QUERIES_PATH)
+pl.consult(BUILD_PATH)
 
 # returns a string that contains proof i
 def get_proof(i, labeled):
@@ -78,6 +81,7 @@ def main(arg):
                 numbers = (int(num[0]), int(num[1]))
             if option == '--tex':
                 only_tex = True
+                labeled  = False
             if option == '--nolabel': 
                 labeled = False
         if type(numbers) == int:
@@ -91,21 +95,16 @@ def main(arg):
             build_full_document(numbers, proofs)
             compile_open_pdf(get_filename(numbers))
 
-    except getopt.GetoptError:
+    except getopt.GetoptError as error:
         # if no valid options are passed, print error message
         # and usage information
-        # TODO: make more elaborate with the offending option
-        print("Unknown option used", arg)
-        # print_usage()
-
-# TODO: use pdflatex quiet mode and instead print progress messages to
-# the terminal
-# TODO: split this up into multiple files (i.e. util etc)
+        print("Error:", error)
+        print_usage()
 
 # handle KeyboardInterrupts
 if __name__ == '__main__':
     try:
-        main(sys.argv)
+        main(sys.argv[1:])
     except KeyboardInterrupt:
         print('Interrupted')
         try:

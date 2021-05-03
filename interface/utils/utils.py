@@ -1,4 +1,5 @@
-from main import USER_MODE
+# import the relevant path variables
+from main import USER_MODE, SYSTEM_PATH, USAGE_PATH, QUERIES_PATH
 import os, subprocess, platform # compiling and opening a LaTeX pdf
 import sys                      # handling KeyboardInterrupts
 import shutil                   # copying the 'preamble.tex' file
@@ -35,15 +36,16 @@ def compile_open_pdf(name):
 
 # print usage information
 def print_usage():
-    with open('usage.txt', 'r') as file:
+    with open(USAGE_PATH, 'r') as file:
         print(file.read(), end='') # no newline at end
     sys.exit(0)
 
 # print version information
 def print_version():
-    with open('../system.pl', 'r') as file:
+    with open(SYSTEM_PATH, 'r') as file:
         line = file.readline()
-        print(line[2:-1]) # remove "% " at start and trailing \n
+        # remove "% " at start and trailing \n
+        print("System", line[2:-1])
     sys.exit(0)
 
 # remove all tex proofs and compiled documents
@@ -58,7 +60,7 @@ def remove_all():
 
 # get the last query number from the queries.pl file
 def get_last_query_no():
-    with open('../queries.pl', 'r') as file:
+    with open(QUERIES_PATH, 'r') as file:
         for line in reversed(list(file)):
             match = re.match("q([0-9]+)\(X\) :-", line)
             if match: break
