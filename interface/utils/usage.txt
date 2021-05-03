@@ -1,17 +1,12 @@
 Usage: 
-    1) ./main.py
-                               Solve all queries; produce a tex file including
+    1) ./main.py               Solve all queries; produce a tex file including
                                preamble and labeled queries; compile the tex 
                                file and open the pdf
-    2) ./main.py [options]
-                               Solve queries and produce/open files according
+    2) ./main.py [options]     Solve queries and produce/open files according
                                to the options
-    3) ./main.py --help
-                               Display this message
-    4) ./main.py --version
-                               Display the system's version
-    5) ./main.py --clean
-                               Remove all proof tex and pdf files
+    3) ./main.py --help        Display this message
+    4) ./main.py --version     Display the system's version
+    5) ./main.py --clean       Remove all proof tex and pdf files
 
 Options:
     -a              Solve all queries in queries.pl
