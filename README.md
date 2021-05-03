@@ -4,6 +4,7 @@ Repository for the Natural Natural Deduction system: a theorem prover for propos
 ## Dependencies
 * [SWI Prolog](https://www.swi-prolog.org/download/stable) version >= 8.2.4 for finding proofs and parsing to LaTeX code
 * [Python](https://www.python.org/) version >= 3.8.5 for file operations
+* The Python module [PySwip](https://pypi.org/project/pyswip/) version >= 0.2.10 for connecting Prolog to Python
 * [pdflatex/TeX Live 2020](https://tug.org/texlive/) for compiling a LaTeX document
 
 ## Install
