@@ -17,7 +17,6 @@ def parse_sentence(line):
     atomic       = re.match(regex_atomic, line)
     unary        = re.match(regex_unary,  line)
     binary       = re.match(regex_binary, line)
-    # TODO: change these if bodies to use .groups()
     if atomic:
         atom = atomic[1]
         if atom == "\\lfalse":
@@ -25,31 +24,33 @@ def parse_sentence(line):
         else:
             return atom.lower()
     if unary:
-        connective = unary[1]
-        argument   = unary[2]
+        connective, argument = unary.groups()
+        # TODO: make this code less ugly
         return connective_to_functor(connective) + "(" + parse_sentence(argument) + ")"
     if binary:
-        argument_1 = binary[1]
-        connective = binary[2]
-        argument_2 = binary[3]
+        argument_1, connective, argument_2 = binary.groups()
+        # TODO: make this code less ugly
         return connective_to_functor(connective) + "(" + parse_sentence(argument_1) + ", " + parse_sentence(argument_2) + ")"
     else:
+        # TODO: should you throw an exception here or not always?
         return ""
 
+# make the premise lines and return as list
 def make_premises(lines):
     premises = []
     i = 1
     for line in lines:
-        print(line)
         formula = parse_sentence(line)
-        print(formula)
+        # TODO: make this code less ugly
         string = "line(" + str(i) + ", " + formula + ", premise, 0)"
         premises.append(string)
         i +=1
     return premises
 
+# make the conclusion line
 def make_conclusion(line):
     formula = parse_sentence(line)
+    # TODO: make this code less ugly
     conclusion = "line(_, " + formula + ", _, _)"
     return conclusion
 
@@ -60,17 +61,23 @@ def read_premises():
     for i in range(1,3):
         p = input(str(i) + ": ")
         premises.append(p)
-    return make_premises(premises)
+    return premises
 
 def read_conclusion():
     print("Put in your conclusion here:")
     conclusion = input("C: ")
-    return make_conclusion(conclusion)
+    return conclusion
 
+# TODO: add function to possibly add outer parentheses
+# FIXME: see bug in instructions
 def input_interface():
     p = read_premises()
     c = read_conclusion()
-    print(p)
-    print(c)
+    premises = make_premises(p)
+    conclusion = make_conclusion(c)
+    print("Premises:", premises)
+    print("Conclusion:", conclusion)
+    # TODO: ask for confirmation whether they are okay with those
+    return premises, conclusion
 
 input_interface()
