@@ -5,20 +5,18 @@ tokens = (
     'LPAREN', 'RPAREN'
     )
 
-# Tokens
-
-# TODO: add even more options for the operators?
+# the IFF regular expression needs to be longer than that of IF, since they
+# are evaluated from longest to shortest
 t_PROP   = r'[A-Z]|[a-z]'
 t_FALSE  = r'\\lfalse|contra|false|\\bot'
-t_NOT    = r'\\lnot|not|\\neg'
-t_AND    = r'\\land|and|\\wedge'
-t_OR     = r'\\lor|or|\\vee'
-t_IFF    = r'\\liff|iff|\\leftrightarrow|\\equiv'
-t_IF     = r'\\lif|if|implies|\\to|\\rightarrow'
+t_NOT    = r'\\lnot|not|\\neg|~|!'
+t_AND    = r'\\land|and|\\wedge|\^|&{1,2}'
+t_OR     = r'\\lor|or|\\vee|v|\|{1,2}'
+t_IFF    = r'\\liff|iff|\\leftrightarrow|\\equiv|<->|<=>'
+t_IF     = r'\\lif|if|implies|\\to|\\rightarrow|->'
 t_LPAREN = r'\('
 t_RPAREN = r'\)'
 
-# Ignored characters
 t_ignore = " \t"
 
 def t_error(t):
