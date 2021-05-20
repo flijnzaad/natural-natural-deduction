@@ -1,9 +1,15 @@
+import re                # regular expressions
+import ply.lex as lex    # lexer
+import ply.yacc as yacc  # parser
+
+# LEXER
+
 tokens = (
     'PROP', 'FALSE',
     'NOT',
     'AND', 'OR', 'IFF', 'IF',
     'LPAREN', 'RPAREN'
-    )
+)
 
 # the IFF regular expression needs to be longer than that of IF, since they
 # are evaluated from longest to shortest
@@ -23,6 +29,8 @@ def t_error(t):
     print(f"Illegal character {t.value[0]!r}")
     t.lexer.skip(1)
 
+# PARSER
+
 # negation has highest precedence
 precedence = (
     ('right', 'AND', 'OR', 'IFF', 'IF'),
@@ -33,27 +41,19 @@ def p_statement_expr(p):
     'statement : expression'
     print(p[1])
 
-# TODO: make this more general like it was before, all binary operators 
-# in one function
-def p_expression_and(p):
-    'expression : expression AND expression'
-    p[0] = "and(" + p[1] + ", " + p[3] + ")"
+def p_expression_binary(p):
+    '''expression : expression AND expression
+                  | expression OR  expression
+                  | expression IF  expression
+                  | expression IFF expression'''
+    if   re.match(t_AND, p[2]): p[0] = "and({}, {})".format(p[1], p[3])
+    elif re.match(t_OR,  p[2]): p[0] =  "or({}, {})".format(p[1], p[3])
+    elif re.match(t_IFF, p[2]): p[0] = "iff({}, {})".format(p[1], p[3])
+    elif re.match(t_IF,  p[2]): p[0] =  "if({}, {})".format(p[1], p[3])
 
-def p_expression_or(p):
-    'expression : expression OR expression'
-    p[0] = "or(" + p[1] + ", " + p[3] + ")"
-
-def p_expression_iff(p):
-    'expression : expression IFF expression'
-    p[0] = "iff(" + p[1] + ", " + p[3] + ")"
-
-def p_expression_if(p):
-    'expression : expression IF expression'
-    p[0] = "if(" + p[1] + ", " + p[3] + ")"
-
-def p_expression_unop(p):
+def p_expression_not(p):
     'expression : NOT expression'
-    p[0] = "neg(" + p[2] + ")"
+    p[0] = "neg({})".format(p[2])
 
 def p_expression_group(p):
     'expression : LPAREN expression RPAREN'
@@ -71,14 +71,5 @@ def p_error(p):
     print(f"Syntax error at {p.value!r}")
 
 # Build the lexer and the parser
-import ply.lex as lex
-import ply.yacc as yacc
 lex.lex()
 yacc.yacc()
-
-while True:
-    try:
-        s = input('parse > ')
-    except EOFError:
-        break
-    yacc.parse(s)
