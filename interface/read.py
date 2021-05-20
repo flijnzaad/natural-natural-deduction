@@ -8,13 +8,12 @@ tokens = (
 # Tokens
 
 # TODO: add even more options for the operators?
-t_PROP   = r'[A-Z]'
+t_PROP   = r'[A-Z]|[a-z]'
 t_FALSE  = r'\\lfalse|contra|false|\\bot'
 t_NOT    = r'\\lnot|not|\\neg'
 t_AND    = r'\\land|and|\\wedge'
 t_OR     = r'\\lor|or|\\vee'
-# TODO: problem with iff and if: `illegal character f'
-t_IFF    = r'\\liff|iff|\\leftrightarrow'
+t_IFF    = r'\\liff|iff|\\leftrightarrow|\\equiv'
 t_IF     = r'\\lif|if|implies|\\to|\\rightarrow'
 t_LPAREN = r'\('
 t_RPAREN = r'\)'
@@ -26,6 +25,7 @@ def t_error(t):
     print(f"Illegal character {t.value[0]!r}")
     t.lexer.skip(1)
 
+# negation has highest precedence
 precedence = (
     ('right', 'AND', 'OR', 'IFF', 'IF'),
     ('right', 'NOT')
