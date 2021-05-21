@@ -1,21 +1,21 @@
 from lexer_parser import *
-from lexer_parser import result
 
 # provide interface, read in the premises that the user puts in
 def read_premises(parser):
-    print("Put in your premise(s) here:")
     premises = []
-    # TODO: this should run until a double \n is encountered
-    for i in range(1,3):
-        premise = input("{}: ".format(i))
+    i = 1
+    # read premises until semicolon is encountered
+    while True:
+        premise = input("Premise {}: ".format(i))
+        if premise == ";": break
         result = parser.parse(premise)
         premises.append(result)
+        i += 1
     return premises
 
 # provide interface, read in the conclusion that the user puts in
 def read_conclusion(parser):
-    print("Put in your conclusion here:")
-    conclusion = input("C: ")
+    conclusion = input("Conclusion: ")
     return parser.parse(conclusion)
 
 def input_interface():
