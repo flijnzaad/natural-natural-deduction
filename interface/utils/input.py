@@ -1,4 +1,4 @@
-from lexer_parser import *
+from utils.lexer_parser import *
 
 # provide interface, read in the premises that the user puts in
 def read_premises(parser):
@@ -23,11 +23,17 @@ def input_interface():
     parser = yacc.yacc()
 
     premises = read_premises(parser)
-    print("Premises:", premises)
-
     conclusion = read_conclusion(parser)
+
+    print("Premises:", premises)
     print("Conclusion:", conclusion)
+
     # TODO: ask for confirmation whether they are okay with those
     return premises, conclusion
 
-input_interface()
+# turn a Python list of Python strings into one Prolog list as a string
+def list_py2pl(pylist):
+    pl_list = "[{}".format(pylist[0])
+    for formula in pylist[1:]:
+        pl_list += ", {}".format(formula)
+    return pl_list + "]"
