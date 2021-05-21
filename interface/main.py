@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from utils.utils import *
+from utils.output import *
 from pyswip import Prolog       # querying our knowledge bases
 pl = Prolog()
 
@@ -21,6 +21,7 @@ def get_proof(i, labeled):
     text = ""
     if labeled: text += "\\paragraph{Proof " + str(i) + "}"
     q = list(pl.query(query))
+    print("Solved!")
     text += q[0]["S"].decode('UTF-8')
     return text
 
@@ -59,19 +60,17 @@ def main(arg):
     long_options  = ["tex", "nolabel", "version", "help", "clean", "clip"]
 
     try:
-        opts, _ = getopt.getopt(arg, short_options, long_options)
+        opts, _  = getopt.getopt(arg, short_options, long_options)
         # defaults
-        labeled = True
+        labeled  = True
         only_tex = False
-        numbers = get_last_query_no()
+        numbers  = get_last_query_no()
 
         for option, argument in opts:
-            if option == '--help':
-                print_usage()
-            if option == '--version':
-                print_version()
-            if option == '--clean':
-                remove_all()
+            if option == '--help':    print_usage()
+            if option == '--version': print_version()
+            if option == '--clean':   remove_all()
+
             if option == '-a':
                 get_last_query_no()
                 numbers = (1, get_last_query_no())
