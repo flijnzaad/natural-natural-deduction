@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from utils.output import *
+from utils.input import *
 from pyswip import Prolog       # querying our knowledge bases
 pl = Prolog()
 
@@ -15,8 +16,18 @@ pl.consult(SYSTEM_PATH)      # load the relevant knowledge bases
 pl.consult(QUERIES_PATH)
 pl.consult(BUILD_PATH)
 
+# TODO: these three functions can be more general
+# read a proof from the input and return a string that contains its proof
+def get_proof_input():
+    premises, conclusion = input_interface()
+    premlist = list_py2pl(premises)
+    query = "provesWrap({}, {}, X)".format(premlist, conclusion)
+    q = list(pl.query(query))
+    print("Solved!")
+    return q[0]["S"].decode('UTF-8')
+
 # returns a string that contains proof i
-def get_proof(i, labeled):
+def get_proof_examples(i, labeled):
     query = "q" + str(i) + "(X), buildProof(X, S)"
     text = ""
     if labeled: text += "\\paragraph{Proof " + str(i) + "}"
@@ -33,7 +44,7 @@ def get_proof_range(numbers, labeled):
         # process printing to terminal
         query_name = "q" + str(i)
         print(query_name + ":")
-        text += get_proof(i, labeled)
+        text += get_proof_examples(i, labeled)
     return text
 
 # build a document with only the code of proofs
@@ -56,7 +67,7 @@ def build_full_document(numbers, proofs):
 
 def main(arg):
     # TODO: add clipboard functionality
-    short_options = "q:r:a"
+    short_options = "q:r:a:i"
     long_options  = ["tex", "nolabel", "version", "help", "clean", "clip"]
 
     try:
@@ -70,6 +81,10 @@ def main(arg):
             if option == '--help':    print_usage()
             if option == '--version': print_version()
             if option == '--clean':   remove_all()
+
+            if option == '-i':
+                get_proof_input()
+                sys.exit(0)
 
             if option == '-a':
                 get_last_query_no()
@@ -88,7 +103,7 @@ def main(arg):
                 labeled = False
 
         if type(numbers) == int:
-            proofs = get_proof(numbers, labeled)
+            proofs = get_proof_examples(numbers, labeled)
         else:
             proofs = get_proof_range(numbers, labeled)
         if USER_MODE: print("Succesfully solved the proof(s)")
