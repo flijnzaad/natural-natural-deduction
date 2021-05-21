@@ -1,6 +1,6 @@
 import re                # regular expressions
-import ply.lex as lex    # lexer
-import ply.yacc as yacc  # parser
+import utils.ply.lex as lex    # lexer
+import utils.ply.yacc as yacc  # parser
 
 # LEXER
 
