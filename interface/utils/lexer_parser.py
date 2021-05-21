@@ -20,8 +20,8 @@ t_AND    = r'\\land|and|\\wedge|\^|&{1,2}'
 t_OR     = r'\\lor|or|\\vee|v|\|{1,2}'
 t_IFF    = r'\\liff|iff|\\leftrightarrow|\\equiv|<->|<=>'
 t_IF     = r'\\lif|if|implies|\\to|\\rightarrow|->'
-t_LPAREN = r'\('
-t_RPAREN = r'\)'
+t_LPAREN = r'\(|\['
+t_RPAREN = r'\)|\]'
 
 t_ignore = " \t"
 
@@ -37,10 +37,12 @@ precedence = (
     ('right', 'NOT')
 )
 
+# "base case"
 def p_statement_expr(p):
     'statement : expression'
-    print(p[1])
+    p[0] = p[1]
 
+# binary connectives
 def p_expression_binary(p):
     '''expression : expression AND expression
                   | expression OR  expression
@@ -51,25 +53,25 @@ def p_expression_binary(p):
     elif re.match(t_IFF, p[2]): p[0] = "iff({}, {})".format(p[1], p[3])
     elif re.match(t_IF,  p[2]): p[0] =  "if({}, {})".format(p[1], p[3])
 
+# negation
 def p_expression_not(p):
     'expression : NOT expression'
     p[0] = "neg({})".format(p[2])
 
+# an expression between parentheses
 def p_expression_group(p):
     'expression : LPAREN expression RPAREN'
     p[0] = p[2]
 
+# propositional atoms
 def p_expression_prop(p):
     'expression : PROP'
     p[0] = p[1].lower()
 
+# contradiction
 def p_expression_false(p):
     'expression : FALSE'
     p[0] = 'contra'
 
 def p_error(p):
     print(f"Syntax error at {p.value!r}")
-
-# Build the lexer and the parser
-lex.lex()
-yacc.yacc()
