@@ -25,15 +25,24 @@ def input_interface():
     premises = read_premises(parser)
     conclusion = read_conclusion(parser)
 
-    print("Premises:", premises)
-    print("Conclusion:", conclusion)
-
     # TODO: ask for confirmation whether they are okay with those
     return premises, conclusion
 
-# turn a Python list of Python strings into one Prolog list as a string
-def list_py2pl(pylist):
-    pl_list = "[{}".format(pylist[0])
-    for formula in pylist[1:]:
-        pl_list += ", {}".format(formula)
+# add the arguments to a line functor and return
+def string_premise(premise, n):
+    return "line({}, {}, premise, 0)".format(n, premise)
+
+# build the list of premises (incl. line functors and line numbers) as a
+# string
+def string_premises(premises):
+    n = 1
+    pl_list = "[{}".format(string_premise(premises[0], n))
+    n += 1
+    for formula in premises[1:]:
+        pl_list += ", {}".format(string_premise(formula, n))
+        n += 1
     return pl_list + "]"
+
+# add the argument to a line functor
+def string_conclusion(conclusion):
+    return "line(_, {}, _, _)".format(conclusion)

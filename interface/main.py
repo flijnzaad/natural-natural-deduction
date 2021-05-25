@@ -17,11 +17,13 @@ pl.consult(QUERIES_PATH)
 pl.consult(BUILD_PATH)
 
 # TODO: these three functions can be more general
+
 # read a proof from the input and return a string that contains its proof
 def get_proof_input():
     premises, conclusion = input_interface()
-    premlist = list_py2pl(premises)
-    query = "provesWrap({}, {}, X)".format(premlist, conclusion)
+    premises   = string_premises(premises)
+    conclusion = string_conclusion(conclusion)
+    query = "provesWrap({}, {}, X), buildProof(X, S)".format(premises, conclusion)
     q = list(pl.query(query))
     print("Solved!")
     return q[0]["S"].decode('UTF-8')
@@ -73,9 +75,10 @@ def main(arg):
     try:
         opts, _  = getopt.getopt(arg, short_options, long_options)
         # defaults
-        labeled  = True
-        only_tex = False
-        numbers  = get_last_query_no()
+        labeled    = True
+        only_tex   = False
+        input_mode = False
+        numbers    = get_last_query_no()
 
         for option, argument in opts:
             if option == '--help':    print_usage()
@@ -83,9 +86,7 @@ def main(arg):
             if option == '--clean':   remove_all()
 
             if option == '-i':
-                get_proof_input()
-                sys.exit(0)
-
+                input_mode = True
             if option == '-a':
                 get_last_query_no()
                 numbers = (1, get_last_query_no())
@@ -102,10 +103,14 @@ def main(arg):
             if option == '--nolabel': 
                 labeled = False
 
-        if type(numbers) == int:
-            proofs = get_proof_examples(numbers, labeled)
+        if input_mode:
+            proofs = get_proof_input()
         else:
-            proofs = get_proof_range(numbers, labeled)
+            if type(numbers) == int:
+                proofs = get_proof_examples(numbers, labeled)
+            else:
+                proofs = get_proof_range(numbers, labeled)
+
         if USER_MODE: print("Succesfully solved the proof(s)")
 
         if only_tex:
