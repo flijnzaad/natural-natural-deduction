@@ -30,9 +30,9 @@ def get_proof_input():
 
 # returns a string that contains proof i
 def get_proof_examples(i, labeled):
-    query = "q" + str(i) + "(X), buildProof(X, S)"
+    query = "q{}(X), buildProof(X, S)".format(i)
     text = ""
-    if labeled: text += "\\paragraph{Proof " + str(i) + "}"
+    if labeled: text += "\\paragraph{{Proof {}}}".format(i)
     q = list(pl.query(query))
     print("Solved!")
     text += q[0]["S"].decode('UTF-8')
@@ -44,8 +44,8 @@ def get_proof_range(numbers, labeled):
     text = ""
     for i in range(begin, end+1):
         # process printing to terminal
-        query_name = "q" + str(i)
-        print(query_name + ":")
+        query_name = "q{}".format(i)
+        print(query_name + ':')
         text += get_proof_examples(i, labeled)
     return text
 
@@ -61,7 +61,7 @@ def build_only_proofs(numbers, proofs):
 def build_full_document(numbers, proofs):
     filename = get_tex_name(numbers)
     shutil.copy(PREAMBLE_PATH, filename)
-    text = '\n\\begin{document}\n' + proofs + '\n\\end{document}\n'
+    text = "\n\\begin{{document}}\n{}\n\\end{{document}}\n".format(proofs)
     with open(filename, 'a') as file:
         file.write(text)
     if USER_MODE:

@@ -84,4 +84,6 @@ def get_tex_name(numbers):
 
 # print a process message that states that a file has been built succesfully
 def print_built_msg(numbers):
-    print("Succesfully built a proof tex file for {}, to be found in {}".format(get_filename(numbers), get_tex_name(numbers)))
+    msg = "Succesfully built a proof tex file for {}, to be found in {}"
+    msg = msg.format(get_filename(numbers), get_tex_name(numbers))
+    print(msg)
