@@ -135,4 +135,4 @@ interface/*.log
 interface/*.pdf
 interface/*.tex
 # but make an exception for the preamble
-!interface/preamble.tex
+!interface/utils/preamble.tex
