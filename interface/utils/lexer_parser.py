@@ -11,8 +11,8 @@ tokens = (
     'LPAREN', 'RPAREN'
 )
 
-# the IFF regular expression needs to be longer than that of IF, since they
-# are evaluated from longest to shortest
+# the IFF regular expression needs to be longer than that of IF, since these 
+# regular expressions are evaluated from longest to shortest
 t_PROP   = r'[A-Z]|[a-z]'
 t_FALSE  = r'\\lfalse|contra|false|\\bot'
 t_NOT    = r'\\lnot|not|\\neg|~|!'
@@ -23,6 +23,7 @@ t_IF     = r'\\lif|if|implies|\\to|\\rightarrow|->'
 t_LPAREN = r'\(|\['
 t_RPAREN = r'\)|\]'
 
+# ignore spaces and tabs
 t_ignore = " \t"
 
 def t_error(t):
@@ -42,16 +43,17 @@ def p_statement_expr(p):
     'statement : expression'
     p[0] = p[1]
 
-# binary connectives
+# binary connectives: combine into the prefix connective
 def p_expression_binary(p):
     '''expression : expression AND expression
                   | expression OR  expression
                   | expression IF  expression
                   | expression IFF expression'''
-    if   re.match(t_AND, p[2]): p[0] = "and({}, {})".format(p[1], p[3])
-    elif re.match(t_OR,  p[2]): p[0] =  "or({}, {})".format(p[1], p[3])
-    elif re.match(t_IFF, p[2]): p[0] = "iff({}, {})".format(p[1], p[3])
-    elif re.match(t_IF,  p[2]): p[0] =  "if({}, {})".format(p[1], p[3])
+    if   re.match(t_AND, p[2]): connective = "and"
+    elif re.match(t_OR,  p[2]): connective = "or"
+    elif re.match(t_IFF, p[2]): connective = "iff"
+    elif re.match(t_IF,  p[2]): connective = "if"
+    p[0] = "{}({}, {})".format(connective, p[1], p[3])
 
 # negation
 def p_expression_not(p):
@@ -63,7 +65,7 @@ def p_expression_group(p):
     'expression : LPAREN expression RPAREN'
     p[0] = p[2]
 
-# propositional atoms
+# propositional atoms are lowercase (atoms) in Prolog
 def p_expression_prop(p):
     'expression : PROP'
     p[0] = p[1].lower()
