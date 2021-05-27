@@ -49,10 +49,10 @@ def p_expression_binary(p):
                   | expression OR  expression
                   | expression IF  expression
                   | expression IFF expression'''
-    if   re.match(t_AND, p[2]): connective = "and"
-    elif re.match(t_OR,  p[2]): connective = "or"
-    elif re.match(t_IFF, p[2]): connective = "iff"
-    elif re.match(t_IF,  p[2]): connective = "if"
+    c = ((t_AND, "and"), (t_OR, "or"), (t_IFF, "iff"), (t_IF, "if"))
+    for token, connective in c:
+        if re.match(token, p[2]):
+            break
     p[0] = "{}({}, {})".format(connective, p[1], p[3])
 
 # negation
