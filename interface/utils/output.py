@@ -56,7 +56,7 @@ def remove_all():
     # TODO: maybe this is also OS-specific
     files = os.listdir()
     for file in files:
-        if file.startswith('q'):
+        if file.startswith('q') or file.startswith("proof_"):
             os.remove(file)
             print("Removed", file)
     sys.exit(0)
@@ -70,8 +70,11 @@ def get_last_query_no():
     n = match.groups()[0]
     return int(n)
 
-# return filename with the query number(s)
+# return filename with the query number(s) in case of an example query,
+# and a timestamp in case of manual input
 def get_filename(numbers):
+    if type(numbers) == str:
+        return numbers
     if type(numbers) == int:
         num = str(numbers)
     else:
@@ -85,5 +88,6 @@ def get_tex_name(numbers):
 # print a process message that states that a file has been built succesfully
 def print_built_msg(numbers):
     msg = "Succesfully built a proof tex file for {}, to be found in {}"
-    msg = msg.format(get_filename(numbers), get_tex_name(numbers))
+    name = "the manually input proof" if type(numbers) == str else get_filename(numbers)
+    msg = msg.format(name, get_tex_name(numbers))
     print(msg)

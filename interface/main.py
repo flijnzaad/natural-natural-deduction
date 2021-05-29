@@ -105,6 +105,10 @@ def main(arg):
 
         if input_mode:
             proofs = get_proof_input()
+            # give the file "proof_[timestamp]" as name
+            from datetime import datetime
+            timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+            numbers = "proof_{}".format(timestamp)
         else:
             if type(numbers) == int:
                 proofs = get_proof_examples(numbers, labeled)
