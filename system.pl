@@ -55,13 +55,13 @@ proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], _) :-
 proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], _) :-
     Line = line(Next, X, conjElim, N),
     member(line(N, and(X, _), _, _), Available),
-    X \= and(X, _)
+    X \= and(X, _),
     nextLineNumber(Available, Next).
 
 proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], _) :-
     Line = line(Next, Y, conjElim, N),
     member(line(N, and(_, Y), _, _), Available),
-    Y \= and(_, Y)
+    Y \= and(_, Y),
     nextLineNumber(Available, Next).
 
 % conjunction introduction:
