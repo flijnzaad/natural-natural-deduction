@@ -1,4 +1,4 @@
-% version 3.8
+% version 3.9
 
 % This makes sure that answers are never abbreviated with "..."
 :- set_prolog_flag(answer_write_options,
@@ -24,9 +24,11 @@ nextLineNumber(L, N) :-
     N is Current + 1.
 
 % prove a subproof
-subproof(ProofLines, Available, Line, End, NewA, Premise, Concl, Next, N1, N2) :-
-    % prove the subproof, the full proof is unified with Subproof
-    provesWrap([Premise], [Premise|Available], Concl, Subproof),
+subproof(ProofLines, Available, Line, End, NewA, Premise, Concl, Next, N1, N2, D) :-
+    % prove the subproof, the full proof is unified with S
+    % TODO: maybe the anonymous variable here is already End or NewA
+    proves([Premise], [Premise|Available], Concl, S, _, D),
+    reverse(S, Subproof),
     % add the Subproof and Line to the previous lines to get End
     End  = [Line|[Subproof|ProofLines]],
     NewA = [Line|[Subproof|Available]],
@@ -40,6 +42,7 @@ proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], _) :-
     Line = line(Next, contra, contraIntro, two(N1, N2)),
     member(line(N1, X, _, _), Available),
     member(line(N2, neg(X), _, _), Available),
+    X \= neg(X),
     nextLineNumber(Available, Next).
 
 % contradiction elimination:
@@ -51,12 +54,14 @@ proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], _) :-
 % conjunction elimination:
 proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], _) :-
     Line = line(Next, X, conjElim, N),
-    member(line(N, and(X,_), _, _), Available),
+    member(line(N, and(X, _), _, _), Available),
+    X \= and(X, _)
     nextLineNumber(Available, Next).
 
 proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], _) :-
     Line = line(Next, Y, conjElim, N),
-    member(line(N, and(_,Y), _, _), Available),
+    member(line(N, and(_, Y), _, _), Available),
+    Y \= and(_, Y)
     nextLineNumber(Available, Next).
 
 % conjunction introduction:
@@ -64,17 +69,21 @@ proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], _) :-
     Line = line(Next, and(X, Y), conjIntro, two(N1, N2)),
     member(line(N1, X, _, _), Available),
     member(line(N2, Y, _, _), Available),
+    X \= and(X, _),
+    Y \= and(_, Y),
     nextLineNumber(Available, Next).
 
 % disjunction introduction:
 proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], _) :-
     Line = line(Next, or(X, _), disjIntro, N),
     member(line(N, X, _, _), Available),
+    X \= or(X, _),
     nextLineNumber(Available, Next).
 
 proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], _) :-
     Line = line(Next, or(_, Y), disjIntro, N),
     member(line(N, Y, _, _), Available),
+    Y \= or(_, Y),
     nextLineNumber(Available, Next).
 
 % implication elimination:
@@ -82,6 +91,7 @@ proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], _) :-
     Line = line(Next, Y, impElim, two(N1, N2)),
     member(line(N1, if(X, Y), _, _), Available),
     member(line(N2, X, _, _), Available),
+    Y \= if(_, Y),
     nextLineNumber(Available, Next).
 
 % bi-implication elimination:
@@ -89,18 +99,21 @@ proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], _) :-
     Line = line(Next, Y, biimpElim, two(N1, N2)),
     member(line(N1, iff(X, Y), _, _), Available),
     member(line(N2, X, _, _), Available),
+    Y \= iff(_, Y),
     nextLineNumber(Available, Next).
 
 proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], _) :-
     Line = line(Next, X, biimpElim, two(N1, N2)),
     member(line(N1, iff(X, Y), _, _), Available),
     member(line(N2, Y, _, _), Available),
+    X \= iff(X, _),
     nextLineNumber(Available, Next).
 
 % negation elimination:
 proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], _) :-
     Line = line(Next, X, negElim, N),
     member(line(N, neg(neg(X)), _, _), Available),
+    X \= neg(neg(X)),
     nextLineNumber(Available, Next).
 
 % reiteration:
@@ -112,55 +125,62 @@ proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], _) :-
 %%% subproof rules
 
 % implication introduction
-proves(ProofLines, Available, Line, End, NewA, _) :-
-    Line    = line(Next, if(X, Y), impIntro, sub(N1, N2)),
+proves(ProofLines, Available, Line, End, NewA, D) :-
+    Line = line(Next, if(X, Y), impIntro, sub(N1, N2)),
+    X \= if(X, _),
     % the premise and conclusion of the subproof
     Premise = line(N1, X, premise, 0),
     Concl   = line(N2, Y, _, _),
     subproof(ProofLines, Available, Line, End, NewA,
-             Premise, Concl, Next, N1, N2).
+             Premise, Concl, Next, N1, N2, D).
 
 % negation introduction
-proves(ProofLines, Available, Line, End, NewA, _) :-
-    Line    = line(Next, neg(X), negIntro, sub(N1, N2)),
+proves(ProofLines, Available, Line, End, NewA, D) :-
+    Line = line(Next, neg(X), negIntro, sub(N1, N2)),
+    X \= neg(X),
     % the premise and conclusion of the subproof
     Premise = line(N1, X, premise, 0),
     Concl   = line(N2, contra, _, _),
     subproof(ProofLines, Available, Line, End, NewA,
-             Premise, Concl, Next, N1, N2).
+             Premise, Concl, Next, N1, N2, D).
 
 %%%
 
 % transitivity:
 proves(ProofLines, Available, LineX, End, NewAvailable, MaxDepth) :-
     LineX = line(_, _, _, _),
-    % don't exceed the current depth D
-    currentLineNumber(ProofLines, D),
+    % don't exceed the current search depth D of *all available lines*
+    currentLineNumber(Available, D),
     D =< MaxDepth,
-    % derive 1 line from the premises
+    % derive 1 line (LineY) from the premises
     proves(ProofLines, Available, LineY, NewP, NewA, MaxDepth),
     LineY = line(_, Y, _, _),
     % don't prove lines you already have (heuristic)
     \+ member(line(_, Y, _, _), ProofLines),
-    % with this step added to the premises, derive line X
+    % currentLineNumber(NewP, Dnew),
+    % Dnew =< MaxDepth,
+    % with LineY added to the premises, derive line X
     proves(NewP, NewA, LineX, End, NewAvailable, MaxDepth), !.
 
-% try to prove Line at the current depth
+% try to prove Line at the current search depth
 provesIDS(Premises, Available, Line, NewP, NewA, D) :-
     proves(Premises, Available, Line, NewP, NewA, D), !.
 
-% else do iterative deepening: increment the depth and try again
+% else do iterative deepening
 provesIDS(Premises, Available, Line, NewP, NewA, D) :-
+    % increment the search depth
     Dnew is D + 1,
     % don't exceed the maximum proof length
     Dnew < 12,
     write('Trying search depth '), write(Dnew), writeln('...'),
+    % try again with the new search depth
     provesIDS(Premises, Available, Line, NewP, NewA, Dnew).
 
 % provesWrap/4 reverses the premises,
 % then calls provesIDS/5 to do the proving,
 % then reverses the final resulting proof in the end
 provesWrap(Premises, Available, Conclusion, X) :-
+    % TODO: you could also just reverse the premises in the query that you pose
     reverse(Premises, P),
     % initial proof depth: number of premises
     currentLineNumber(Premises, D),
