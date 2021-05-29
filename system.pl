@@ -1,4 +1,4 @@
-% version 3.9
+% version 3.10
 
 % This makes sure that answers are never abbreviated with "..."
 :- set_prolog_flag(answer_write_options,
@@ -34,8 +34,33 @@ subproof(ProofLines, Available, Line, End, NewA, Premise, Concl, Next, N1, N2, D
     NewA = [Line|[Subproof|Available]],
     % calculate the line numbers
     nextLineNumber(Available, N1),
-    nextLineNumber([Subproof|ProofLines], Next),
-    N2 is Next - 1.
+    % TODO: maybe this could be more efficient: also, does this still work
+    % with nested subproofs, shouldn't this be Available instead of ProofLines?
+    currentLineNumber([Subproof|ProofLines], N2),
+    Next is N2 + 1.
+
+% prove two subproofs
+subproofs(ProofLines1, Available1, Line, End, NewA, Premise1, Premise2, 
+          Concl1, Concl2, Next, N1, N2, N3, N4, D) :-
+    % prove the first subproof, the full proof is unified with S1
+    % TODO: maybe the anonymous variable here is already End or NewA
+    proves([Premise1], [Premise1|Available1], Concl1, S1, _, D),
+    reverse(S1, Subproof1),
+    ProofLines2 = [Subproof1|ProofLines1],
+    Available2  = [Subproof1|Available1],
+    % TODO: is the depth D still okay here?
+    proves([Premise2], [Premise2|Available2], Concl2, S2, _, D),
+    reverse(S2, Subproof2),
+    % add the Subproof1 and Line to the previous lines to get End
+    End  = [Line|[Subproof2|ProofLines2]],
+    NewA = [Line|[Subproof2|Available2]],
+    % calculate the line numbers
+    % TODO: maybe this could be more efficient
+    nextLineNumber(Available1, N1),
+    nextLineNumber(Available2, N2),
+    N3 is N2 + 1,
+    currentLineNumber(NewA, N4),
+    Next is N4 + 1.
 
 % contradiction introduction:
 proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], _) :-
@@ -144,6 +169,18 @@ proves(ProofLines, Available, Line, End, NewA, D) :-
     subproof(ProofLines, Available, Line, End, NewA,
              Premise, Concl, Next, N1, N2, D).
 
+% disjunction elimination
+% TODO: this causes problems with the amount of possibilities
+% proves(ProofLines, Available, Line, End, NewA, D) :-
+%     Line = line(Next, Z, disjElim, three(N0, sub(N1, N2), sub(N3, N4))),
+%     member(line(N0, or(X, Y), _, _), Available),
+%     Premise1 = line(N1, X, premise, 0),
+%     Concl1   = line(N2, Z, _, _),
+%     Premise2 = line(N3, Y, premise, 0),
+%     Concl2   = line(N4, Z, _, _),
+%     subproofs(ProofLines, Available, Line, End, NewA, Premise1, Premise2,
+%               Concl1, Concl2, Next, N1, N2, N3, N4, D).
+
 %%%
 
 % transitivity:
@@ -187,6 +224,8 @@ provesWrap(Premises, Available, Conclusion, X) :-
     provesIDS(P, Available, Conclusion, Y, _, D),
     % newline for neat progress printing
     reverse(Y, X).
+    % TODO: maybe just only reverse the proof in the end, including the
+    % subproof, with a manual predicate
 
 % if you don't have the Available argument, instantiate it with Premises
 provesWrap(Premises, Conclusion, X) :-
