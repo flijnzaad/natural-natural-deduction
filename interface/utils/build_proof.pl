@@ -24,6 +24,11 @@ oneLine(Line, String) :-
     is_list(Line), !,
     buildProof(Line, String).
 
+% base case for building empty premise: then next line is always subproof in PL
+buildPremises([H|T], [H|T], Build, String) :-
+    is_list(H), !,
+    atomics_to_string([Build, "\n}{\n"], "", String).
+
 % base case for building the last premise
 % when the next line is a regular line
 buildPremises([H|T], T, Build, String) :-

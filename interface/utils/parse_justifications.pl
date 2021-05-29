@@ -8,7 +8,7 @@ stringCon("contra", "$\\lfalse$").
 
 % strings for premises and reiteration; cut to discard other options
 stringJust(premise, "") :- !.
-stringJust(reit, "Reit") :- !.
+stringJust(reit, "Reit: ") :- !.
 
 % get justification for introduction rule
 stringJust(Justification, String) :-
