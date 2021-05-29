@@ -99,29 +99,28 @@ q17(X) :-                                   % needs total 8 lines
     Concl    = line(_, or(d, f), _, _),
     provesWrap(Premises, Concl, X).
 
-q18(X) :-
+q18(X) :-                                   % needs total 4 lines
     Premises = [line(1, q, premise, 0)],
     Concl    = line(_, if(p, q), _, _),
     provesWrap(Premises, Concl, X).
 
-q19(X) :-
+q19(X) :-                                   % needs total 6 lines
     Premises = [line(1, if(p, q), premise, 0),
                 line(2, if(q, r), premise, 0)],
     Concl    = line(_, if(p, r), _, _),
     provesWrap(Premises, Concl, X).
 
-q20(X) :-
+q20(X) :-                                   % needs total 5 lines
     Premises = [line(1, if(or(p, q), r), premise, 0)],
     Concl    = line(_, if(p, r), _, _),
     provesWrap(Premises, Concl, X).
 
-q21(X) :-
+q21(X) :-                                   % needs total 10 lines
     Premises = [line(1, if(or(p, q), r), premise, 0)],
     Concl    = line(_, and(if(p, r), if(q, r)), _, _),
     provesWrap(Premises, Concl, X).
 
-q22(X) :-
+q22(X) :-                                   % needs total 4 lines
     Premises = [line(1, p, premise, 0)],
     Concl    = line(_, neg(neg(p)), _, _),
     provesWrap(Premises, Concl, X).
-
