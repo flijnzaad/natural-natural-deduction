@@ -25,6 +25,9 @@ main :-
     writeln('q19: '), q19(_19), writelines(_19), nl,
     writeln('q20: '), q20(_20), writelines(_20), nl,
     % writeln('q21: '), q21(_21), writelines(_21), nl,
+    writeln('q22: '), q22(_22), writelines(_22), nl,
+    writeln('q23: '), q23(_23), writelines(_23), nl,
+    writeln('q24: '), q24(_24), writelines(_24), nl,
     halt(0).
 
 writelines([], _).
@@ -40,11 +43,13 @@ writelines([H|T], Indent) :-
     write(C), nl,
     writelines(T, Indent).
 
+% if subproof, indent and print the subproof, then the rest
 writelines([H|T], Indent) :-
     is_list(H), !,
     NewIndent is Indent + 4,
     writelines(H, NewIndent),
     writelines(T, Indent).
 
+% wrapper to start at zero indentation
 writelines(L) :-
     writelines(L, 0).

@@ -3,7 +3,7 @@ q1(X) :-                                    % needs total 3 lines
     Concl    = line(_, or(p,q), _, _),
     provesWrap(Premises, Concl, X).
 
-q2(X) :-                                    % needs total 3 lines
+q2(X) :-                                    % needs total 4 lines
     Premises = [line(1, and(p, q), premise, 0),
                 line(2, if(p, r), premise, 0)],
     Concl    = line(_, r, _, _),
@@ -123,4 +123,14 @@ q21(X) :-                                   % needs total 10 lines
 q22(X) :-                                   % needs total 4 lines
     Premises = [line(1, p, premise, 0)],
     Concl    = line(_, neg(neg(p)), _, _),
+    provesWrap(Premises, Concl, X).
+
+q23(X) :-                                   % needs total 3 lines
+    Premises = [],
+    Concl    = line(_, if(p, p), _, _),
+    provesWrap(Premises, Concl, X).
+
+q24(X) :-                                   % needs total 6 lines
+    Premises = [line(1, or(a, a), premise, 0)],
+    Concl    = line(_, a, _, _),
     provesWrap(Premises, Concl, X).
