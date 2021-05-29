@@ -19,7 +19,7 @@ stringJust(Justification, String) :-
     % obtain LaTeX code for connective
     stringCon(Connective, C),
     % combine connective and "Intro" to final String
-    atomics_to_string([C, "~", "Intro"], "", String).
+    atomics_to_string([C, "~", "Intro: "], "", String).
 
 % get justification for elimination rule
 stringJust(Justification, String) :-
@@ -30,4 +30,4 @@ stringJust(Justification, String) :-
     % obtain LaTeX code for connective
     stringCon(Connective, C),
     % combine connective and "Intro" to final String
-    atomics_to_string([C, "~", "Elim"], "", String).
+    atomics_to_string([C, "~", "Elim: "], "", String).
