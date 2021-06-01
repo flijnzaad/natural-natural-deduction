@@ -1,4 +1,4 @@
-% version 3.11
+% version 3.12
 
 % This makes sure that answers are never abbreviated with "..."
 :- set_prolog_flag(answer_write_options,
@@ -40,7 +40,6 @@ subproof(ProofLines, Available, Line, End, NewA, Premise, Concl, Next, N1, N2, D
     Next is N2 + 1.
 
 % prove two subproofs
-% FIXME: this is causing some issues
 subproofs(ProofLines1, Available1, Line, End, NewA, Premise1, Premise2, 
           Concl1, Concl2, Next, N1, N2, N3, N4, D) :-
     % prove the first subproof, the full proof is unified with S1
@@ -58,10 +57,10 @@ subproofs(ProofLines1, Available1, Line, End, NewA, Premise1, Premise2,
     % calculate the line numbers
     % TODO: maybe this could be more efficient
     nextLineNumber(Available1, N1),
-    nextLineNumber(Available2, N2),
+    currentLineNumber(Available2, N2),
     N3 is N2 + 1,
-    currentLineNumber(NewA, N4),
-    Next is N4 + 1.
+    currentLineNumber(NewA, Next),
+    N4 is Next - 1.
 
 % contradiction introduction:
 proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], _) :-
@@ -170,26 +169,26 @@ proves(ProofLines, Available, Line, End, NewA, D) :-
     subproof(ProofLines, Available, Line, End, NewA,
              Premise, Concl, Next, N1, N2, D).
 
-% % disjunction elimination:
-% proves(ProofLines, Available, Line, End, NewA, D) :-
-%     Line = line(Next, Z, disjElim, three(N0, sub(N1, N2), sub(N3, N4))),
-%     member(line(N0, or(X, Y), _, _), Available),
-%     Premise1 = line(N1, X, premise, 0),
-%     Concl1   = line(N2, Z, _, _),
-%     Premise2 = line(N3, Y, premise, 0),
-%     Concl2   = line(N4, Z, _, _),
-%     subproofs(ProofLines, Available, Line, End, NewA, Premise1, Premise2,
-%               Concl1, Concl2, Next, N1, N2, N3, N4, D).
+% disjunction elimination:
+proves(ProofLines, Available, Line, End, NewA, D) :-
+    Line = line(Next, Z, disjElim, three(N0, sub(N1, N2), sub(N3, N4))),
+    member(line(N0, or(X, Y), _, _), Available),
+    Premise1 = line(N1, X, premise, 0),
+    Concl1   = line(N2, Z, _, _),
+    Premise2 = line(N3, Y, premise, 0),
+    Concl2   = line(N4, Z, _, _),
+    subproofs(ProofLines, Available, Line, End, NewA, Premise1, Premise2,
+              Concl1, Concl2, Next, N1, N2, N3, N4, D).
 
-% % bi-implication introduction:
-% proves(ProofLines, Available, Line, End, NewA, D) :-
-%     Line = line(Next, iff(X, Y), biimpIntro, two(sub(N1, N2), sub(N3, N4))),
-%     Premise1 = line(N1, X, premise, 0),
-%     Concl1   = line(N2, Y, _, _),
-%     Premise2 = line(N3, Y, premise, 0),
-%     Concl2   = line(N4, X, _, _),
-%     subproofs(ProofLines, Available, Line, End, NewA, Premise1, Premise2,
-%               Concl1, Concl2, Next, N1, N2, N3, N4, D).
+% bi-implication introduction:
+proves(ProofLines, Available, Line, End, NewA, D) :-
+    Line = line(Next, iff(X, Y), biimpIntro, two(sub(N1, N2), sub(N3, N4))),
+    Premise1 = line(N1, X, premise, 0),
+    Concl1   = line(N2, Y, _, _),
+    Premise2 = line(N3, Y, premise, 0),
+    Concl2   = line(N4, X, _, _),
+    subproofs(ProofLines, Available, Line, End, NewA, Premise1, Premise2,
+              Concl1, Concl2, Next, N1, N2, N3, N4, D).
 
 %%%
 
