@@ -134,3 +134,8 @@ q24(X) :-                                   % needs total 6 lines
     Premises = [line(1, or(a, a), premise, 0)],
     Concl    = line(_, a, _, _),
     provesWrap(Premises, Concl, X).
+
+q25(X) :-                                   % needs total 5 lines
+    Premises = [],
+    Concl    = line(_, iff(a, a), _, _),
+    provesWrap(Premises, Concl, X).
