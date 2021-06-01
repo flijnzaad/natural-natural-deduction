@@ -1,5 +1,5 @@
-# Natural Natural Deduction
-Repository for the Natural Natural Deduction system: a theorem prover for propositional logic and first-order logic that uses natural deduction and heuristics to find its proofs.
+# "Natural" Natural Deduction
+Repository for the "Natural" Natural Deduction system: a theorem prover for propositional logic that uses natural deduction and heuristics to find its proofs.
 
 ## Dependencies
 * [SWI Prolog](https://www.swi-prolog.org/download/stable) version >= 8.2.4 for finding proofs and parsing to LaTeX code
@@ -9,8 +9,8 @@ Repository for the Natural Natural Deduction system: a theorem prover for propos
 
 ## Install
 ```
-git clone https://github.com/flijnzaad/bachelor-project.git natural-deduction
-cd natural-deduction
+git clone https://github.com/flijnzaad/natural-natural-deduction.git natural-natural-deduction
+cd natural-natural-deduction
 chmod +x test.pl interface/main.py
 ```
 
@@ -40,20 +40,7 @@ chmod +x test.pl interface/main.py
 
 ### Debugging
 
-* You can turn on the trace like so:
-
-      ?- trace.
-
-    * You will then be able to walk through the steps of the system with each <kbd>Enter</kbd> press.
-    * To abort the query in the `trace` mode, type <kbd>a</kbd> for `[a]bort`.
-
-* You can exit `trace` mode like so:
-
-      [trace]  ? - nodebug.
-
 * If the system gets stuck in infinite recursion, you can stop it with <kbd>Ctrl</kbd> + <kbd>C</kbd>. Then type <kbd>a</kbd>, for `[a]bort`.
-
-* If your query returns `true` without a full stop at the end, there are still alternative branches of the search tree to be explored. Press <kbd>;</kbd> to explore another branch, press <kbd>.</kbd> or <kbd>Enter</kbd> to terminate the search there.
 
 * To find out how long execution of a query is taking, you may use the [`time/1`](https://www.swi-prolog.org/pldoc/man?predicate=time%2f1) predicate, e.g. `time(q5(X))`.
 
