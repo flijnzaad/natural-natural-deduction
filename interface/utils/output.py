@@ -5,6 +5,8 @@ import sys                      # handling KeyboardInterrupts
 import shutil                   # copying the 'preamble.tex' file
 import getopt                   # handling command line arguments
 import re                       # regular expressions
+import signal                   # timing out the Prolog search
+from contextlib import contextmanager
 
 # remove the .aux and .log files produced by the LaTeX compilation
 def clean_auxiliary_files(name):
@@ -91,3 +93,16 @@ def print_built_msg(numbers):
     name = "the manually input proof" if type(numbers) == str else get_filename(numbers)
     msg = msg.format(name, get_tex_name(numbers))
     print(msg)
+
+class TimeoutException(Exception): pass
+
+@contextmanager
+def time_limit(seconds):
+    def signal_handler(signum, frame):
+        raise TimeoutException("Timed out!")
+    signal.signal(signal.SIGALRM, signal_handler)
+    signal.alarm(seconds)
+    try:
+        yield
+    finally:
+        signal.alarm(0)

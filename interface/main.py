@@ -16,7 +16,15 @@ pl.consult(SYSTEM_PATH)      # load the relevant knowledge bases
 pl.consult(QUERIES_PATH)
 pl.consult(BUILD_PATH)
 
-# TODO: these three functions can be more general
+def solve_query(query):
+    try:
+        with time_limit(10):
+            q = list(pl.query(query, catcherrors=False))
+            print("Solved!")
+            return q[0]["S"].decode('UTF-8')
+    except TimeoutException as e:
+        print("Timed out!")
+        sys.exit(0)
 
 # read a proof from the input and return a string that contains its proof
 def get_proof_input():
@@ -24,18 +32,14 @@ def get_proof_input():
     premises   = string_premises(premises)
     conclusion = string_conclusion(conclusion)
     query = "provesWrap({}, {}, X), buildProof(X, S)".format(premises, conclusion)
-    q = list(pl.query(query))
-    print("Solved!")
-    return q[0]["S"].decode('UTF-8')
+    return solve_query(query)
 
 # returns a string that contains proof i
 def get_proof_examples(i, labeled):
     query = "q{}(X), buildProof(X, S)".format(i)
     text = ""
     if labeled: text += "\\paragraph{{Proof {}}}".format(i)
-    q = list(pl.query(query))
-    print("Solved!")
-    text += q[0]["S"].decode('UTF-8')
+    text += solve_query(query)
     return text
 
 # returns a string that contains the proofs in the given range
