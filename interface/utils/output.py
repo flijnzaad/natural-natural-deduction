@@ -90,19 +90,9 @@ def get_tex_name(numbers):
 # print a process message that states that a file has been built succesfully
 def print_built_msg(numbers):
     msg = "Succesfully built a proof tex file for {}, to be found in {}"
-    name = "the manually input proof" if type(numbers) == str else get_filename(numbers)
+    if type(numbers) == str:
+        name = "the manually input proof"
+    else:
+        name = get_filename(numbers)
     msg = msg.format(name, get_tex_name(numbers))
     print(msg)
-
-class TimeoutException(Exception): pass
-
-@contextmanager
-def time_limit(seconds):
-    def signal_handler(signum, frame):
-        raise TimeoutException("Timed out!")
-    signal.signal(signal.SIGALRM, signal_handler)
-    signal.alarm(seconds)
-    try:
-        yield
-    finally:
-        signal.alarm(0)

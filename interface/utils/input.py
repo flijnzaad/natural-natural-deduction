@@ -25,6 +25,10 @@ def input_interface():
     premises = read_premises(parser)
     conclusion = read_conclusion(parser)
 
+    print("Querying the system with this argument:")
+    print("    Premises: ", premises)
+    print("    Conclusion: ", conclusion)
+
     # TODO: ask for confirmation whether they are okay with those
     return premises, conclusion
 
@@ -35,6 +39,8 @@ def string_premise(premise, n):
 # build the list of premises (incl. line functors and line numbers) as a
 # string
 def string_premises(premises):
+    # empty premises
+    if not premises: return "[]"
     n = 1
     pl_list = "[{}".format(string_premise(premises[0], n))
     n += 1
