@@ -3,10 +3,12 @@
 from utils.output import *
 from utils.input import *
 from pyswip import Prolog       # querying our knowledge bases
+from pyswip.prolog import PrologError
 pl = Prolog()
 
-USER_MODE     = True                  # debug constant
-SYSTEM_PATH   = "../system.pl"        # relevant paths
+USER_MODE     = True            # debug constant
+TIMEOUT       = 10              # timeout for query in seconds
+SYSTEM_PATH   = "../system.pl"  # relevant paths
 QUERIES_PATH  = "../queries.pl"
 PREAMBLE_PATH = "utils/preamble.tex"
 BUILD_PATH    = "utils/build_proof.pl"
@@ -16,30 +18,49 @@ pl.consult(SYSTEM_PATH)      # load the relevant knowledge bases
 pl.consult(QUERIES_PATH)
 pl.consult(BUILD_PATH)
 
+# prints the appropriate timeout message to the screen
+def print_timeout_msg(query):
+    if query.startswith("provesWrap"):
+        name = "the manually input query"
+    else:
+        name = "query {}".format(query[1:-3])
+    print("Timeout: the proof search for {} took longer than {} seconds and "
+          "was aborted".format(name, TIMEOUT))
+
+# solve a query within the TIMEOUT time limit;
+# return the Fitch code as made by `buildProof`
 def solve_query(query):
+    # call with set time limit to avoid getting stuck
+    final = ( "call_with_time_limit({}, {}), "
+              "buildProof(X, S)".format(TIMEOUT, query) )
     try:
-        with time_limit(10):
-            q = list(pl.query(query, catcherrors=False))
+        q = list(pl.query(final))
+        if q:
             print("Solved!")
             return q[0]["S"].decode('UTF-8')
-    except TimeoutException as e:
-        print("Timed out!")
-        sys.exit(0)
+    except PrologError:
+        print_timeout_msg(query)
+        return None
 
 # read a proof from the input and return a string that contains its proof
 def get_proof_input():
     premises, conclusion = input_interface()
     premises   = string_premises(premises)
     conclusion = string_conclusion(conclusion)
-    query = "provesWrap({}, {}, X), buildProof(X, S)".format(premises, conclusion)
+    query = "provesWrap({}, {}, X)".format(premises, conclusion)
+    proof = solve_query(query)
+    if proof is None:
+        sys.exit(1)
     return solve_query(query)
 
 # returns a string that contains proof i
 def get_proof_examples(i, labeled):
-    query = "q{}(X), buildProof(X, S)".format(i)
+    query = "q{}(X)".format(i)
     text = ""
     if labeled: text += "\\paragraph{{Proof {}}}".format(i)
-    text += solve_query(query)
+    proof = solve_query(query)
+    if proof is not None:
+        text += proof
     return text
 
 # returns a string that contains the proofs in the given range
@@ -103,7 +124,8 @@ def main(arg):
                 only_tex = True
                 labeled  = False
             if option == '--clip':
-                print("This option has yet to be implemented. Using default options")
+                print("This option has yet to be implemented. "
+                      "Using default options")
             if option == '--nolabel': 
                 labeled = False
 
