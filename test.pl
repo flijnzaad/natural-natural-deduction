@@ -29,6 +29,7 @@ main :-
     writeln('q23: '), q23(_23), writelines(_23), nl,
     writeln('q24: '), q24(_24), writelines(_24), nl,
     writeln('q25: '), q25(_25), writelines(_25), nl,
+    writeln('q26: '), q26(_26), writelines(_26), nl,
     halt(0).
 
 writelines([], _).
