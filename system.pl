@@ -1,4 +1,4 @@
-% version 3.12
+% version 3.12.2
 
 % This makes sure that answers are never abbreviated with "..."
 :- set_prolog_flag(answer_write_options,
@@ -44,16 +44,21 @@ subproofs(ProofLines1, Available1, Line, End, NewA, Premise1, Premise2,
           Concl1, Concl2, Next, N1, N2, N3, N4, D) :-
     % prove the first subproof, the full proof is unified with S1
     % TODO: maybe the anonymous variable here is already End or NewA
+    write('Premise:' ), writeln(Premise1),
+    write('Conclusion:' ), writeln(Concl1), nl,
     proves([Premise1], [Premise1|Available1], Concl1, S1, _, D),
+    writeln('Solved first subproof'),
     reverse(S1, Subproof1),
     ProofLines2 = [Subproof1|ProofLines1],
     Available2  = [Subproof1|Available1],
+    write('Available first: '), writeln(Available2), nl,
     % TODO: is the depth D still okay here?
     proves([Premise2], [Premise2|Available2], Concl2, S2, _, D),
     reverse(S2, Subproof2),
     % add the Subproof1 and Line to the previous lines to get End
     End  = [Line|[Subproof2|ProofLines2]],
     NewA = [Line|[Subproof2|Available2]],
+    write('Available second: '), writeln(NewA), nl,
     % calculate the line numbers
     % TODO: maybe this could be more efficient
     nextLineNumber(Available1, N1),
@@ -124,6 +129,7 @@ proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], _) :-
     Line = line(Next, Y, biimpElim, two(N1, N2)),
     member(line(N1, iff(X, Y), _, _), Available),
     member(line(N2, X, _, _), Available),
+    X \= iff(X, _),
     Y \= iff(_, Y),
     nextLineNumber(Available, Next).
 
@@ -132,6 +138,7 @@ proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], _) :-
     member(line(N1, iff(X, Y), _, _), Available),
     member(line(N2, Y, _, _), Available),
     X \= iff(X, _),
+    Y \= iff(_, Y),
     nextLineNumber(Available, Next).
 
 % negation elimination:
@@ -183,6 +190,8 @@ proves(ProofLines, Available, Line, End, NewA, D) :-
 % bi-implication introduction:
 proves(ProofLines, Available, Line, End, NewA, D) :-
     Line = line(Next, iff(X, Y), biimpIntro, two(sub(N1, N2), sub(N3, N4))),
+    X \= iff(X, _),
+    Y \= iff(_, Y),
     Premise1 = line(N1, X, premise, 0),
     Concl1   = line(N2, Y, _, _),
     Premise2 = line(N3, Y, premise, 0),
@@ -200,11 +209,8 @@ proves(ProofLines, Available, LineX, End, NewAvailable, MaxDepth) :-
     D =< MaxDepth,
     % derive 1 line (LineY) from the premises
     proves(ProofLines, Available, LineY, NewP, NewA, MaxDepth),
-    LineY = line(_, Y, _, _),
     % don't prove lines you already have (heuristic)
-    \+ member(line(_, Y, _, _), ProofLines),
-    % currentLineNumber(NewP, Dnew),
-    % Dnew =< MaxDepth,
+    \+ member(LineY, ProofLines),
     % with LineY added to the premises, derive line X
     proves(NewP, NewA, LineX, End, NewAvailable, MaxDepth), !.
 
@@ -226,15 +232,12 @@ provesIDS(Premises, Available, Line, NewP, NewA, D) :-
 % then calls provesIDS/5 to do the proving,
 % then reverses the final resulting proof in the end
 provesWrap(Premises, Available, Conclusion, X) :-
-    % TODO: you could also just reverse the premises in the query that you pose
     reverse(Premises, P),
     % initial proof depth: number of premises
     currentLineNumber(Premises, D),
     provesIDS(P, Available, Conclusion, Y, _, D),
     % newline for neat progress printing
     reverse(Y, X).
-    % TODO: maybe just only reverse the proof in the end, including the
-    % subproof, with a manual predicate
 
 % if you don't have the Available argument, instantiate it with Premises
 provesWrap(Premises, Conclusion, X) :-
