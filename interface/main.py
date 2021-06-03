@@ -77,7 +77,8 @@ def get_proof_range(numbers, labeled):
 
 def main(arg):
     short_options = "q:r:a:i"
-    long_options  = ["tex", "nolabel", "version", "help", "clean", "clip"]
+    long_options  = ["tex", "nolabel", "cliptex", "clip",
+                     "version", "help", "clean"]
 
     try:
         opts, _  = getopt.getopt(arg, short_options, long_options)
@@ -106,9 +107,11 @@ def main(arg):
             if option == '--tex':
                 only_tex = True
                 labeled  = False
-            if option == '--clip':
+            if option == '--cliptex':
                 clip     = True
                 only_tex = True
+            if option == '--clip':
+                clip     = True
             if option == '--nolabel': 
                 labeled = False
 
@@ -130,8 +133,8 @@ def main(arg):
 
         if only_tex:
             build_only_proofs(numbers, proofs)
-            if clip:
-                copy_proof_to_clip(proofs)
+        if clip:
+            copy_proof_to_clip(proofs)
         else:
             build_full_document(numbers, proofs)
             compile_open_pdf(get_filename(numbers))

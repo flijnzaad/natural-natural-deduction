@@ -14,7 +14,9 @@ Options:
     -r i,j          Solve queries i until and including j
     -i              Manually input premises and conclusion; end the input of
                     premises by typing ';'.
-    --tex           Only produce a tex file without preamble or labeled 
+    --tex           Only produce a tex file without preamble or labeled
                     queries, don't compile or open pdf
-    --clip          Same as --tex, but copy this tex file to the clipboard
+    --clip          Same as --tex, but copy the LaTeX code to the clipboard
+                    instead of producing a tex file
+    --cliptex       Same as --clip, but also produce the tex file
     --nolabel       Don't add labels to the queries
