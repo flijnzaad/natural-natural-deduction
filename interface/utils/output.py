@@ -20,7 +20,7 @@ def clean_auxiliary_files(name):
 def compile_open_pdf(name):
     # TODO: maybe this is also OS-specific
     compile_command = "pdflatex {}.tex".format(name)
-    if USER_MODE: 
+    if USER_MODE:
         # TODO: and this too
         compile_command += ' -interaction=batchmode 2>&1 > /dev/null'
     if USER_MODE: print("Compiling the pdf...")
@@ -101,8 +101,7 @@ def print_built_msg(numbers):
 def build_only_proofs(numbers, proofs):
     with open(get_tex_name(numbers), 'w') as file:
         file.write(proofs)
-    if USER_MODE:
-        print_built_msg(numbers)
+    if USER_MODE: print_built_msg(numbers)
 
 # build a tex file with the code of proofs: add the preamble and surround
 # with begin/end document
@@ -112,5 +111,16 @@ def build_full_document(numbers, proofs):
     text = "\n\\begin{{document}}\n{}\n\\end{{document}}\n".format(proofs)
     with open(filename, 'a') as file:
         file.write(text)
-    if USER_MODE:
-        print_built_msg(numbers)
+    if USER_MODE: print_built_msg(numbers)
+
+# copy the string in the argument to the clipboard
+def copy_proof_to_clip(proofs):
+    # cross-platform clipboard functionality without extra installs
+    from tkinter import Tk
+    r = Tk()
+    r.withdraw()
+    r.clipboard_clear()
+    r.clipboard_append(proofs)
+    r.update()
+    r.destroy()
+    if USER_MODE: print("Copied to the system clipboard")

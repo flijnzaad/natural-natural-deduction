@@ -76,7 +76,6 @@ def get_proof_range(numbers, labeled):
     return text
 
 def main(arg):
-    # TODO: add clipboard functionality
     short_options = "q:r:a:i"
     long_options  = ["tex", "nolabel", "version", "help", "clean", "clip"]
 
@@ -85,6 +84,7 @@ def main(arg):
         # defaults
         labeled    = True
         only_tex   = False
+        clip       = False
         input_mode = False
         numbers    = get_last_query_no()
 
@@ -107,8 +107,8 @@ def main(arg):
                 only_tex = True
                 labeled  = False
             if option == '--clip':
-                print("This option has yet to be implemented. "
-                      "Using default options")
+                clip     = True
+                only_tex = True
             if option == '--nolabel': 
                 labeled = False
 
@@ -120,18 +120,21 @@ def main(arg):
             numbers = "proof_{}".format(timestamp)
         else:
             if type(numbers) == int:
+                # single query
                 proofs = get_proof_examples(numbers, labeled)
             else:
+                # range of queries
                 proofs = get_proof_range(numbers, labeled)
 
         if USER_MODE: print("Succesfully solved the proof(s)")
 
         if only_tex:
             build_only_proofs(numbers, proofs)
+            if clip:
+                copy_proof_to_clip(proofs)
         else:
             build_full_document(numbers, proofs)
             compile_open_pdf(get_filename(numbers))
-
     except getopt.GetoptError as error:
         # if an invalid option is passed, print error message and usage info
         print("Error:", error)
