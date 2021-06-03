@@ -1,4 +1,4 @@
-% version 3.13
+% version 3.14
 
 :- consult('connectives.pl').
 
@@ -29,6 +29,8 @@ nextLineNumber(L, N) :-
 subproof(ProofLines, Available, Line, End, NewA, Premise, Concl, Next, N1, N2, D, C) :-
     % prove the subproof, the full proof is unified with S
     % TODO: maybe the anonymous variable here is already End or NewA
+    currentLineNumber(Available, Dnew),
+    Dnew =< D,
     proves([Premise], [Premise|Available], Concl, S, _, D, C),
     reverse(S, Subproof),
     % add the Subproof and Line to the previous lines to get End
@@ -42,10 +44,12 @@ subproof(ProofLines, Available, Line, End, NewA, Premise, Concl, Next, N1, N2, D
     Next is N2 + 1.
 
 % prove two subproofs
-subproofs(ProofLines1, Available1, Line, End, NewA, Premise1, Premise2, 
+subproofs(ProofLines1, Available1, Line, End, NewA, Premise1, Premise2,
           Concl1, Concl2, Next, N1, N2, N3, N4, D, C) :-
     % prove the first subproof, the full proof is unified with S1
     % TODO: maybe the anonymous variable here is already End or NewA
+    currentLineNumber(Available1, Dnew),
+    Dnew =< D,
     proves([Premise1], [Premise1|Available1], Concl1, S1, _, D, C),
     reverse(S1, Subproof1),
     ProofLines2 = [Subproof1|ProofLines1],
@@ -182,6 +186,8 @@ proves(ProofLines, Available, Line, End, NewA, D, C) :-
 proves(ProofLines, Available, Line, End, NewA, D, C) :-
     Line = line(Next, Z, disjElim, three(N0, sub(N1, N2), sub(N3, N4))),
     member(line(N0, or(X, Y), _, _), Available),
+    % TODO: is this a sound line?
+    ground(or(X, Y)),
     Premise1 = line(N1, X, premise, 0),
     Concl1   = line(N2, Z, _, _),
     Premise2 = line(N3, Y, premise, 0),
