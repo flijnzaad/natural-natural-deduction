@@ -1,5 +1,5 @@
 # import the relevant path variables
-from main import USER_MODE, SYSTEM_PATH, USAGE_PATH, QUERIES_PATH
+from main import USER_MODE, SYSTEM_PATH, USAGE_PATH, QUERIES_PATH, PREAMBLE_PATH
 import os, subprocess, platform # compiling and opening a LaTeX pdf
 import sys                      # handling KeyboardInterrupts
 import shutil                   # copying the 'preamble.tex' file
@@ -96,3 +96,21 @@ def print_built_msg(numbers):
         name = get_filename(numbers)
     msg = msg.format(name, get_tex_name(numbers))
     print(msg)
+
+# build a document with only the code of proofs
+def build_only_proofs(numbers, proofs):
+    with open(get_tex_name(numbers), 'w') as file:
+        file.write(proofs)
+    if USER_MODE:
+        print_built_msg(numbers)
+
+# build a tex file with the code of proofs: add the preamble and surround
+# with begin/end document
+def build_full_document(numbers, proofs):
+    filename = get_tex_name(numbers)
+    shutil.copy(PREAMBLE_PATH, filename)
+    text = "\n\\begin{{document}}\n{}\n\\end{{document}}\n".format(proofs)
+    with open(filename, 'a') as file:
+        file.write(text)
+    if USER_MODE:
+        print_built_msg(numbers)

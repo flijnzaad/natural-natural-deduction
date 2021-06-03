@@ -8,13 +8,14 @@ pl = Prolog()
 
 USER_MODE     = True            # debug constant
 TIMEOUT       = 10              # timeout for query in seconds
-SYSTEM_PATH   = "../system.pl"  # relevant paths
+
+SYSTEM_PATH   = "../system.pl"  # relevant filepaths
 QUERIES_PATH  = "../queries.pl"
 PREAMBLE_PATH = "utils/preamble.tex"
 BUILD_PATH    = "utils/build_proof.pl"
 USAGE_PATH    = "utils/usage.txt"
 
-pl.consult(SYSTEM_PATH)      # load the relevant knowledge bases
+pl.consult(SYSTEM_PATH)         # load the relevant knowledge bases
 pl.consult(QUERIES_PATH)
 pl.consult(BUILD_PATH)
 
@@ -28,7 +29,7 @@ def print_timeout_msg(query):
           "was aborted".format(name, TIMEOUT))
 
 # solve a query within the TIMEOUT time limit;
-# return the Fitch code as made by `buildProof`
+# return the LaTeX code as made by `buildProof`
 def solve_query(query):
     # call with set time limit to avoid getting stuck
     final = ( "call_with_time_limit({}, {}), "
@@ -73,24 +74,6 @@ def get_proof_range(numbers, labeled):
         print(query_name + ':')
         text += get_proof_examples(i, labeled)
     return text
-
-# build a document with only the code of proofs
-def build_only_proofs(numbers, proofs):
-    with open(get_tex_name(numbers), 'w') as file:
-        file.write(proofs)
-    if USER_MODE:
-        print_built_msg(numbers)
-
-# build a tex file with the code of proofs: add the preamble and surround
-# with begin/end document
-def build_full_document(numbers, proofs):
-    filename = get_tex_name(numbers)
-    shutil.copy(PREAMBLE_PATH, filename)
-    text = "\n\\begin{{document}}\n{}\n\\end{{document}}\n".format(proofs)
-    with open(filename, 'a') as file:
-        file.write(text)
-    if USER_MODE:
-        print_built_msg(numbers)
 
 def main(arg):
     # TODO: add clipboard functionality
