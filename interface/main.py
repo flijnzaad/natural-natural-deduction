@@ -7,13 +7,14 @@ from pyswip.prolog import PrologError
 pl = Prolog()
 
 USER_MODE     = True            # debug constant
-TIMEOUT       = 10              # timeout for query in seconds
+TIMEOUT       = 100             # timeout for query in seconds
 
-SYSTEM_PATH   = "../system.pl"  # relevant filepaths
-QUERIES_PATH  = "../queries.pl"
-PREAMBLE_PATH = "utils/preamble.tex"
-BUILD_PATH    = "utils/build_proof.pl"
-USAGE_PATH    = "utils/usage.txt"
+SYSTEM_PATH     = "../system.pl"  # relevant filepaths
+QUERIES_PATH    = "../queries.pl"
+PREAMBLE_PATH   = "utils/preamble.tex"
+BUILD_PATH      = "utils/build_proof.pl"
+USAGE_PATH      = "utils/usage.txt"
+INPUT_HELP_PATH = "utils/input-instructions.txt"
 
 pl.consult(SYSTEM_PATH)         # load the relevant knowledge bases
 pl.consult(QUERIES_PATH)
@@ -78,7 +79,7 @@ def get_proof_range(numbers, labeled):
 def main(arg):
     short_options = "q:r:a:i"
     long_options  = ["tex", "nolabel", "cliptex", "clip",
-                     "version", "help", "clean"]
+                     "version", "help", "in-help", "clean"]
 
     try:
         opts, _  = getopt.getopt(arg, short_options, long_options)
@@ -91,6 +92,7 @@ def main(arg):
 
         for option, argument in opts:
             if option == '--help':    print_usage()
+            if option == '--in-help': print_input_help()
             if option == '--version': print_version()
             if option == '--clean':   remove_all()
 

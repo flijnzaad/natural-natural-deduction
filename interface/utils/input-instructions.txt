@@ -1,0 +1,26 @@
+You have to input formulas in the 'regular' infix notation: for example,
+
+    (P and not P) implies contra
+
+Use disambiguating parentheses where needed.
+
+You can use the following options for the different tokens:
+    - propositional parameters:
+        a single uppercase or lowercase letter
+    - conjunction:
+        and, \land, \wedge, ^, &, &&, ∧
+    - disjunction:
+        or, \lor, \vee, v, |, ||, ∨
+    - negation:
+        not, \lnot, \neg, ~, !, ¬
+    - implication:
+        if, implies, \lif, \to, \rightarrow, ->, →
+    - bi-implication:
+        iff, \liff, \leftrightarrow, \equiv, <->, <=>, ↔
+    - contradiction:
+        contra, false, \lfalse, \bot, ⊥
+    - parentheses:
+        ( ) and [ ]
+
+You can put in the premises one by one at the prompt. When you are done with
+putting in the premises, type a ';' to continue to putting in the conclusion.

@@ -1,5 +1,6 @@
 # import the relevant path variables
-from main import USER_MODE, SYSTEM_PATH, USAGE_PATH, QUERIES_PATH, PREAMBLE_PATH
+from main import USER_MODE, USAGE_PATH, INPUT_HELP_PATH
+from main import SYSTEM_PATH, QUERIES_PATH, PREAMBLE_PATH
 import os, subprocess, platform # compiling and opening a LaTeX pdf
 import sys                      # handling KeyboardInterrupts
 import shutil                   # copying the 'preamble.tex' file
@@ -42,6 +43,12 @@ def compile_open_pdf(name):
 # print usage information
 def print_usage():
     with open(USAGE_PATH, 'r') as file:
+        print(file.read(), end='') # no newline at end
+    sys.exit(0)
+
+# print input help information
+def print_input_help():
+    with open(INPUT_HELP_PATH, 'r') as file:
         print(file.read(), end='') # no newline at end
     sys.exit(0)
 

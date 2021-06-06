@@ -5,15 +5,16 @@ Usage:
     2) ./main.py [options]     Solve queries and produce/open files according
                                to the options
     3) ./main.py --help        Display this message
-    4) ./main.py --version     Display the system's version
-    5) ./main.py --clean       Remove all proof tex and pdf files
+    4) ./main.py --in-help     Display the input help
+    5) ./main.py --version     Display the system's version
+    6) ./main.py --clean       Remove all proof tex and pdf files
 
 Options:
     -a              Solve all queries in queries.pl
     -q i            Solve only query number i
     -r i,j          Solve queries i until and including j
-    -i              Manually input premises and conclusion; end the input of
-                    premises by typing ';'.
+    -i              Manually input premises and conclusion; see --in-help
+                    for instructions and more information.
     --tex           Only produce a tex file without preamble or labeled
                     queries, don't compile or open pdf
     --clip          Same as --tex, but copy the LaTeX code to the clipboard
