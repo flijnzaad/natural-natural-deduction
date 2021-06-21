@@ -1,37 +1,35 @@
-connectives(Premises, Conclusion, Connective) :-
-    connList(Premises, Connective),
-    % obtain list of connectives in the conclusion
-    connLine(Conclusion, Connective).
+% base case for list recursion: fail
+connective([], _) :-
+    !, fail.
 
-% base case to stop recursion
-connList([], _).
+% base case for list recursion
+connective([H|_], Connective) :-
+    connective(H, Connective), !.
 
 % recursively go through the list
-connList([H|T], List) :-
-    connLine(H, L1),
-    connList(T, L2).
+connective([_|T], Connective) :-
+    connective(T, Connective), !.
 
 % get rid of the line/4 wrapper functor
-connLine(line(_, Formula, _, _), List) :-
-    connLine(Formula, List), !.
+connective(line(_, Formula, _, _), Connective) :-
+    connective(Formula, Connective), !.
 
-% stop when at atomic term
-connLine(Term, []) :-
-    atomic(Term), !.
+% base case: succeed
+connective(Formula, Connective) :-
+    functor(Formula, Connective, _), !.
 
-% binary functors: add the connective to the list, process both arguments
-connLine(Term, [Connective|Tail]) :-
-    functor(Term, Connective, N),
-    N =:= 2, !,
-    arg(1, Term, X),
-    arg(2, Term, Y),
-    connLine(X, L1),
-    connLine(Y, L2),
-    append(L1, L2, Tail).
+% base case: fail
+connective(Term, _) :-
+    atomic(Term), !, fail.
 
-% unary functor: add the connective to the list, process the argument
-connLine(Term, [Connective|Tail]) :-
-    functor(Term, Connective, N),
-    N =:= 1, !,
-    arg(1, Term, X),
-    connLine(X, Tail).
+% check in first argument
+connective(Formula, Connective) :-
+    functor(Formula, Functor, _),
+    arg(1, Formula, X),
+    connective(X, Connective), !.
+
+% check in second argument
+connective(Formula, Connective) :-
+    functor(Formula, Functor, 2),
+    arg(2, Formula, X),
+    connective(X, Connective), !.
