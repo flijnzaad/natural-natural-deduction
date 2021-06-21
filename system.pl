@@ -1,4 +1,4 @@
-% version 3.14
+% version 3.15
 
 :- consult('connectives.pl').
 
@@ -27,10 +27,10 @@ nextLineNumber(L, N) :-
 
 % prove a subproof
 subproof(ProofLines, Available, Line, End, NewA, Premise, Concl, Next, N1, N2, D, C) :-
-    % prove the subproof, the full proof is unified with S
-    % TODO: maybe the anonymous variable here is already End or NewA
     currentLineNumber(Available, Dnew),
     Dnew =< D,
+    % prove the subproof, the full proof is unified with S
+    % TODO: maybe the anonymous variable here is already End or NewA
     proves([Premise], [Premise|Available], Concl, S, _, D, C),
     reverse(S, Subproof),
     % add the Subproof and Line to the previous lines to get End
@@ -46,10 +46,10 @@ subproof(ProofLines, Available, Line, End, NewA, Premise, Concl, Next, N1, N2, D
 % prove two subproofs
 subproofs(ProofLines1, Available1, Line, End, NewA, Premise1, Premise2,
           Concl1, Concl2, Next, N1, N2, N3, N4, D, C) :-
-    % prove the first subproof, the full proof is unified with S1
-    % TODO: maybe the anonymous variable here is already End or NewA
     currentLineNumber(Available1, Dnew),
     Dnew =< D,
+    % prove the first subproof, the full proof is unified with S1
+    % TODO: maybe the anonymous variable here is already End or NewA
     proves([Premise1], [Premise1|Available1], Concl1, S1, _, D, C),
     reverse(S1, Subproof1),
     ProofLines2 = [Subproof1|ProofLines1],
@@ -185,7 +185,8 @@ proves(ProofLines, Available, Line, End, NewA, D, C) :-
 % disjunction elimination:
 proves(ProofLines, Available, Line, End, NewA, D, C) :-
     Line = line(Next, Z, disjElim, three(N0, sub(N1, N2), sub(N3, N4))),
-    member(line(N0, or(X, Y), _, _), Available),
+    member(line(N0, or(X, Y), Justification, _), Available),
+    Justification \= disjIntro,
     % TODO: is this a sound line?
     ground(or(X, Y)),
     Premise1 = line(N1, X, premise, 0),
@@ -208,18 +209,32 @@ proves(ProofLines, Available, Line, End, NewA, D, C) :-
     subproofs(ProofLines, Available, Line, End, NewA, Premise1, Premise2,
               Concl1, Concl2, Next, N1, N2, N3, N4, D, C).
 
+% proof by contradiction
+proves(ProofLines, Available, Line, End, NewA, D, C) :-
+    Line    = line(Next1, X, negElim, Next),
+    Premise = line(N1, neg(X), premise, 0),
+    Concl   = line(N2, contra, _, _),
+    DoubleN = line(Next, neg(neg(X)), negIntro, sub(N1, N2)),
+    subproof(ProofLines, Available, DoubleN, End1, NewA1,
+             Premise, Concl, Next, N1, N2, D, C),
+    End  = [Line|End1],
+    NewA = [Line|NewA1],
+    Next1 is Next + 1.
+
 %%%
 
 % transitivity:
 proves(ProofLines, Available, LineX, End, NewAvailable, MaxDepth, C) :-
-    LineX = line(_, _, _, _),
+    LineX = line(_, Formula, _, _),
+    % the Formula to prove should be instantiated
+    nonvar(Formula),
     % don't exceed the current search depth D of *all available lines*
     currentLineNumber(Available, D),
     D =< MaxDepth,
     % derive 1 line (LineY) from the premises
     proves(ProofLines, Available, LineY, NewP, NewA, MaxDepth, C),
     % don't prove lines you already have (heuristic)
-    \+ member(LineY, ProofLines),
+    \+ member(LineY, Available),
     % with LineY added to the premises, derive line X
     proves(NewP, NewA, LineX, End, NewAvailable, MaxDepth, C), !.
 
