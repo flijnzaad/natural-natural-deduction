@@ -1,19 +1,15 @@
-connectives(Premises, Conclusion, List) :-
-    % obtain list of connectives in the premises
-    connList(Premises, L1),
+connectives(Premises, Conclusion, Connective) :-
+    connList(Premises, Connective),
     % obtain list of connectives in the conclusion
-    connLine(Conclusion, L2),
-    % concatenate them to get the final list
-    append(L1, L2, List).
+    connLine(Conclusion, Connective).
 
 % base case to stop recursion
-connList([], []).
+connList([], _).
 
-% recursively go through the list of premises
+% recursively go through the list
 connList([H|T], List) :-
     connLine(H, L1),
-    connList(T, L2),
-    append(L1, L2, List).
+    connList(T, L2).
 
 % get rid of the line/4 wrapper functor
 connLine(line(_, Formula, _, _), List) :-
@@ -25,7 +21,8 @@ connLine(Term, []) :-
 
 % binary functors: add the connective to the list, process both arguments
 connLine(Term, [Connective|Tail]) :-
-    functor(Term, Connective, 2), !,
+    functor(Term, Connective, N),
+    N =:= 2, !,
     arg(1, Term, X),
     arg(2, Term, Y),
     connLine(X, L1),
@@ -34,6 +31,7 @@ connLine(Term, [Connective|Tail]) :-
 
 % unary functor: add the connective to the list, process the argument
 connLine(Term, [Connective|Tail]) :-
-    functor(Term, Connective, 1), !,
+    functor(Term, Connective, N),
+    N =:= 1, !,
     arg(1, Term, X),
     connLine(X, Tail).
