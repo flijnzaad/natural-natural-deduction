@@ -146,3 +146,7 @@ q26(X) :-                                   % needs total 8 lines
     Concl    = line(_, q, _, _),
     provesWrap(Premises, Concl, X).
 
+q27(X) :-                                   % needs total 9 lines
+    Premises = [],
+    Concl    = line(_, or(p, neg(p)), _, _),
+    provesWrap(Premises, Concl, X).
