@@ -24,12 +24,11 @@ connective(Term, _) :-
 
 % check in first argument
 connective(Formula, Connective) :-
-    functor(Formula, Functor, _),
     arg(1, Formula, X),
     connective(X, Connective), !.
 
 % check in second argument
 connective(Formula, Connective) :-
-    functor(Formula, Functor, 2),
+    functor(Formula, _, 2),
     arg(2, Formula, X),
     connective(X, Connective), !.
