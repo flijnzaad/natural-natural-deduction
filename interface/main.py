@@ -7,7 +7,7 @@ from pyswip.prolog import PrologError
 pl = Prolog()
 
 USER_MODE     = True            # debug constant
-TIMEOUT       = 100             # timeout for query in seconds
+TIMEOUT       = 600             # timeout for query in seconds
 
 SYSTEM_PATH     = "../system.pl"  # relevant filepaths
 QUERIES_PATH    = "../queries.pl"
@@ -33,7 +33,7 @@ def print_timeout_msg(query):
 # return the LaTeX code as made by `buildProof`
 def solve_query(query):
     # call with set time limit to avoid getting stuck
-    final = ( "call_with_time_limit({}, {}), "
+    final = ( "time(call_with_time_limit({}, {})), "
               "buildProof(X, S)".format(TIMEOUT, query) )
     try:
         q = list(pl.query(final))
@@ -53,7 +53,7 @@ def get_proof_input():
     proof = solve_query(query)
     if proof is None:
         sys.exit(1)
-    return solve_query(query)
+    return proof
 
 # returns a string that contains proof i
 def get_proof_examples(i, labeled):
