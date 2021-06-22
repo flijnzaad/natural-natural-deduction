@@ -133,10 +133,11 @@ def main(arg):
 
         if USER_MODE: print("Succesfully solved the proof(s)")
 
-        if only_tex:
-            build_only_proofs(numbers, proofs)
         if clip:
             copy_proof_to_clip(proofs)
+
+        if only_tex:
+            build_only_proofs(numbers, proofs)
         else:
             build_full_document(numbers, proofs)
             compile_open_pdf(get_filename(numbers))
