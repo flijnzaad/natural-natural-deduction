@@ -19,7 +19,7 @@ t_NOT    = r'\\lnot|not|\\neg|~|!|¬'
 t_AND    = r'\\land|and|\\wedge|\^|&{1,2}|∧'
 t_OR     = r'\\lor|or|\\vee|v|\|{1,2}|∨'
 t_IFF    = r'\\liff|iff|\\leftrightarrow|\\equiv|<->|<=>|↔'
-t_IF     = r'\\lif|if|implies|\\to|\\rightarrow|->|→'
+t_IF     = r'\\lif|if|implies|\\to|\\rightarrow|->|>|→'
 t_LPAREN = r'\(|\['
 t_RPAREN = r'\)|\]'
 
