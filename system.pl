@@ -1,4 +1,4 @@
-% version 3.15
+% version 3.16
 
 :- consult('connectives.pl').
 
@@ -232,9 +232,9 @@ proves(ProofLines, Available, LineX, End, NewAvailable, MaxDepth, C) :-
     currentLineNumber(Available, D),
     D =< MaxDepth,
     % derive 1 line (LineY) from the premises
-    proves(ProofLines, Available, LineY, NewP, NewA, MaxDepth, C),
+    proves(ProofLines, Available, line(_, Y, _, _), NewP, NewA, MaxDepth, C),
     % don't prove lines you already have (heuristic)
-    \+ member(LineY, Available),
+    \+ member(line(_, Y, _, _), Available),
     % with LineY added to the premises, derive line X
     proves(NewP, NewA, LineX, End, NewAvailable, MaxDepth, C), !.
 
@@ -247,7 +247,7 @@ provesIDS(Premises, Available, Line, NewP, NewA, D, C) :-
     % increment the search depth
     Dnew is D + 1,
     % don't exceed the maximum proof length
-    Dnew < 12,
+    Dnew < 30,
     write('Trying search depth '), write(Dnew), writeln('...'),
     % try again with the new search depth
     provesIDS(Premises, Available, Line, NewP, NewA, Dnew, C).
