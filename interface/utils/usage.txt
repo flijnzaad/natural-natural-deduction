@@ -1,7 +1,7 @@
 Usage: 
-    1) ./main.py               Solve all queries; produce a tex file including
-                               preamble and labeled queries; compile the tex 
-                               file and open the pdf
+    1) ./main.py               Solve the last example query; produce a tex
+                               file including preamble and label the query;
+                               compile the tex file and open the pdf
     2) ./main.py [options]     Solve queries and produce/open files according
                                to the options
     3) ./main.py --help        Display this message
@@ -10,11 +10,11 @@ Usage:
     6) ./main.py --clean       Remove all proof tex and pdf files
 
 Options:
-    -a              Solve all queries in queries.pl
+    -a              Solve all example queries in queries.pl
     -q i            Solve only query number i
     -r i,j          Solve queries i until and including j
     -i              Manually input premises and conclusion; see --in-help
-                    for instructions and more information.
+                    for instructions and more information
     --tex           Only produce a tex file without preamble or labeled
                     queries, don't compile or open pdf
     --clip          Same as --tex, but copy the LaTeX code to the clipboard

@@ -1,6 +1,7 @@
 * You have to input formulas in the 'regular' infix notation: for example,
     (P and not P) implies contra
-* Use disambiguating parentheses where needed.
+* Use disambiguating parentheses where needed. They are not needed for
+  conjunctions or disjunctions of more than 2 arguments.
 * You can use the following options for the different tokens:
   - propositional parameters:
       a single uppercase or lowercase letter
@@ -11,7 +12,7 @@
   - negation:
       not, \lnot, \neg, ~, !, ¬
   - implication:
-      if, implies, \lif, \to, \rightarrow, ->, →
+      if, implies, \lif, \to, \rightarrow, ->, >, →
   - bi-implication:
       iff, \liff, \leftrightarrow, \equiv, <->, <=>, ↔
   - contradiction:
