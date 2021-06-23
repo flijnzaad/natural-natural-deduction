@@ -150,3 +150,13 @@ q27(X) :-                                   % needs total 9 lines
     Premises = [],
     Concl    = line(_, or(p, neg(p)), _, _),
     provesWrap(Premises, Concl, X).
+
+q28(X) :-                                   % needs total 11 lines
+    Premises = [],
+    Concl    = line(_, iff(if(a, contra), if(a, neg(a))), _, _),
+    provesWrap(Premises, Concl, X).
+
+q29(X) :-                                   % needs total 7 lines
+    Premises = [],
+    Concl    = line(_, iff(iff(a, b), iff(b, a)), _, _),
+    provesWrap(Premises, Concl, X).
