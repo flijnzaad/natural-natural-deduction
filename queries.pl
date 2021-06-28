@@ -160,3 +160,13 @@ q29(X) :-                                   % needs total 7 lines
     Premises = [],
     Concl    = line(_, iff(iff(a, b), iff(b, a)), _, _),
     provesWrap(Premises, Concl, X).
+
+q30(X) :-
+    Premises = [line(_, if(a, contra), _, _)],
+    Concl    = line(_, if(a, neg(a)), _, _),
+    provesWrap(Premises, Concl, X).
+
+q31(X) :-
+    Premises = [line(_, if(a, neg(a)), _, _)],
+    Concl    = line(_, if(a, contra), _, _),
+    provesWrap(Premises, Concl, X).
