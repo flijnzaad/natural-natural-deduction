@@ -1,4 +1,4 @@
-% version 3.16
+% version 3.17
 
 :- consult('connectives.pl').
 
@@ -52,12 +52,16 @@ subproofs(ProofLines1, Available1, Line, End, NewA, Premise1, Premise2,
     % TODO: maybe the anonymous variable here is already End or NewA
     proves([Premise1], [Premise1|Available1], Concl1, S1, _, D, C),
     reverse(S1, Subproof1),
+    % add the Subproof1 to the previous ProofLines1 and Available1 to get
+    % intermediate proof line lists
     ProofLines2 = [Subproof1|ProofLines1],
     Available2  = [Subproof1|Available1],
+    currentLineNumber(Available2, Dnewer),
+    Dnewer =< D,
     % TODO: is the depth D still okay here?
     proves([Premise2], [Premise2|Available2], Concl2, S2, _, D, C),
     reverse(S2, Subproof2),
-    % add the Subproof1 and Line to the previous lines to get End
+    % add the Subproof2 and Line to the previous lines to get End
     End  = [Line|[Subproof2|ProofLines2]],
     NewA = [Line|[Subproof2|Available2]],
     % calculate the line numbers
@@ -227,12 +231,14 @@ proves(ProofLines, Available, Line, End, NewA, D, C) :-
 proves(ProofLines, Available, LineX, End, NewAvailable, MaxDepth, C) :-
     LineX = line(_, Formula, _, _),
     % the Formula to prove should be instantiated
-    nonvar(Formula),
+    ground(Formula),
     % don't exceed the current search depth D of *all available lines*
     currentLineNumber(Available, D),
     D =< MaxDepth,
     % derive 1 line (LineY) from the premises
     proves(ProofLines, Available, line(_, Y, _, _), NewP, NewA, MaxDepth, C),
+    % the line you just proved should be instantiated
+    ground(Y),
     % don't prove lines you already have (heuristic)
     \+ member(line(_, Y, _, _), Available),
     % with LineY added to the premises, derive line X
