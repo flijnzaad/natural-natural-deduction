@@ -138,7 +138,7 @@ def main(arg):
 
         if only_tex:
             build_only_proofs(numbers, proofs)
-        else:
+        elif not clip:
             build_full_document(numbers, proofs)
             compile_open_pdf(get_filename(numbers))
     except getopt.GetoptError as error:
