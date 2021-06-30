@@ -1,4 +1,4 @@
-% version 3.18
+% version 3.19
 
 :- consult('connectives.pl').
 
@@ -73,106 +73,94 @@ subproofs(ProofLines1, Available1, Line, End, NewA, Premise1, Premise2,
     N4 is Next - 1.
 
 % contradiction introduction:
-proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], D, _) :-
+proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], _, _) :-
     Line = line(Next, contra, contraIntro, two(N1, N2)),
     member(line(N1, X, _, _), Available),
     member(line(N2, neg(X), _, _), Available),
     X \= neg(X),
-    nextLineNumber(Available, Next),
-    Next =< D.
+    nextLineNumber(Available, Next).
 
 % contradiction elimination:
-proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], D, _) :-
+proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], _, _) :-
     Line = line(Next, _, contraElim, N),
     member(line(N, contra, _, _), Available),
-    nextLineNumber(Available, Next),
-    Next =< D.
+    nextLineNumber(Available, Next).
 
 % conjunction elimination:
-proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], D, _) :-
+proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], _, _) :-
     Line = line(Next, X, conjElim, N),
     member(line(N, and(X, _), _, _), Available),
     X \= and(X, _),
-    nextLineNumber(Available, Next),
-    Next =< D.
+    nextLineNumber(Available, Next).
 
-proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], D, _) :-
+proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], _, _) :-
     Line = line(Next, Y, conjElim, N),
     member(line(N, and(_, Y), _, _), Available),
     Y \= and(_, Y),
-    nextLineNumber(Available, Next),
-    Next =< D.
+    nextLineNumber(Available, Next).
 
 % conjunction introduction:
-proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], D, C) :-
+proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], _, C) :-
     member(and, C),
     Line = line(Next, and(X, Y), conjIntro, two(N1, N2)),
     member(line(N1, X, _, _), Available),
     member(line(N2, Y, _, _), Available),
     X \= and(X, _),
     Y \= and(_, Y),
-    nextLineNumber(Available, Next),
-    Next =< D.
+    nextLineNumber(Available, Next).
 
 % disjunction introduction:
-proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], D, C) :-
+proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], _, C) :-
     member(or, C),
     Line = line(Next, or(X, _), disjIntro, N),
     member(line(N, X, _, _), Available),
     X \= or(X, _),
-    nextLineNumber(Available, Next),
-    Next =< D.
+    nextLineNumber(Available, Next).
 
-proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], D, C) :-
+proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], _, C) :-
     member(or, C),
     Line = line(Next, or(_, Y), disjIntro, N),
     member(line(N, Y, _, _), Available),
     Y \= or(_, Y),
-    nextLineNumber(Available, Next),
-    Next =< D.
+    nextLineNumber(Available, Next).
 
 % implication elimination:
-proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], D, _) :-
+proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], _, _) :-
     Line = line(Next, Y, impElim, two(N1, N2)),
     member(line(N1, if(X, Y), _, _), Available),
     member(line(N2, X, _, _), Available),
     Y \= if(_, Y),
-    nextLineNumber(Available, Next),
-    Next =< D.
+    nextLineNumber(Available, Next).
 
 % bi-implication elimination:
-proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], D, _) :-
+proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], _, _) :-
     Line = line(Next, Y, biimpElim, two(N1, N2)),
     member(line(N1, iff(X, Y), _, _), Available),
     member(line(N2, X, _, _), Available),
     X \= iff(X, _),
     Y \= iff(_, Y),
-    nextLineNumber(Available, Next),
-    Next =< D.
+    nextLineNumber(Available, Next).
 
-proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], D, _) :-
+proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], _, _) :-
     Line = line(Next, X, biimpElim, two(N1, N2)),
     member(line(N1, iff(X, Y), _, _), Available),
     member(line(N2, Y, _, _), Available),
     X \= iff(X, _),
     Y \= iff(_, Y),
-    nextLineNumber(Available, Next),
-    Next =< D.
+    nextLineNumber(Available, Next).
 
 % negation elimination:
-proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], D, _) :-
+proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], _, _) :-
     Line = line(Next, X, negElim, N),
     member(line(N, neg(neg(X)), _, _), Available),
     X \= neg(neg(X)),
-    nextLineNumber(Available, Next),
-    Next =< D.
+    nextLineNumber(Available, Next).
 
 % reiteration:
-proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], D, _) :-
+proves(ProofLines, Available, Line, [Line|ProofLines], [Line|Available], _, _) :-
     Line = line(Next, X, reit, N),
     member(line(N, X, _, _), Available),
-    nextLineNumber(Available, Next),
-    Next =< D.
+    nextLineNumber(Available, Next).
 
 %%% subproof rules
 
@@ -249,8 +237,6 @@ proves(ProofLines, Available, LineX, End, NewAvailable, MaxDepth, C) :-
     D =< MaxDepth,
     % derive 1 line (LineY) from the premises
     proves(ProofLines, Available, line(_, Y, _, _), NewP, NewA, MaxDepth, C),
-    % the line you just proved should be instantiated
-    ground(Y),
     % don't prove lines you already have (heuristic)
     \+ member(line(_, Y, _, _), Available),
     % with LineY added to the premises, derive line X
