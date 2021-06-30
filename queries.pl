@@ -162,11 +162,27 @@ q29(X) :-                                   % needs total 7 lines
     provesWrap(Premises, Concl, X).
 
 q30(X) :-
-    Premises = [line(_, if(a, contra), _, _)],
+    Premises = [line(1, if(a, contra), premise, 0)],
     Concl    = line(_, if(a, neg(a)), _, _),
     provesWrap(Premises, Concl, X).
 
 q31(X) :-
-    Premises = [line(_, if(a, neg(a)), _, _)],
+    Premises = [line(1, if(a, neg(a)), _, _)],
     Concl    = line(_, if(a, contra), _, _),
+    provesWrap(Premises, Concl, X).
+
+q32(X) :-
+    Premises = [line(1, if(neg(or(p, q)), p), premise, 0)],
+    Concl    = line(_, or(p, q), _, _),
+    provesWrap(Premises, Concl, X).
+
+q33(X) :-
+    Premises = [line(1, if(or(neg(p), q), p), premise, 0)],
+    Concl    = line(_, p, _, _),
+    provesWrap(Premises, Concl, X).
+
+q34(X) :-
+    Premises = [line(1, if(a, neg(a)), premise, 0),
+                line(2, if(or(neg(a), b), c), premise, 0)],
+    Concl    = line(_, c, _, _),
     provesWrap(Premises, Concl, X).
