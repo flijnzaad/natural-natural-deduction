@@ -201,3 +201,9 @@ q37(X) :-
     Premises = [],
     Concl    = line(_, iff(if(neg(b), neg(a)), if(a, b)), _, _),
     provesWrap(Premises, Concl, X).
+
+q38(X) :-
+    Premises = [line(1, or(a, b), premise, 0),
+                line(2, if(a, neg(c)), premise, 0)],
+    Concl    = line(_, if(neg(b), neg(c)), _, _),
+    provesWrap(Premises, Concl, X).
