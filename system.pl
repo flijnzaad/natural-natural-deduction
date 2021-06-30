@@ -1,4 +1,4 @@
-% version 3.19
+% version 3.20
 
 :- consult('connectives.pl').
 
@@ -38,9 +38,7 @@ subproof(ProofLines, Available, Line, End, NewA, Premise, Concl, Next, N1, N2, D
     NewA = [Line|[Subproof|Available]],
     % calculate the line numbers
     nextLineNumber(Available, N1),
-    % TODO: maybe this could be more efficient: also, does this still work
-    % with nested subproofs, shouldn't this be Available instead of ProofLines?
-    currentLineNumber([Subproof|ProofLines], N2),
+    currentLineNumber([Subproof|Available], N2),
     Next is N2 + 1.
 
 % prove two subproofs
