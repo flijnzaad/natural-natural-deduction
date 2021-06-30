@@ -1,4 +1,4 @@
-% version 3.20
+% version 3.21
 
 :- consult('connectives.pl').
 
@@ -27,7 +27,7 @@ nextLineNumber(L, N) :-
 
 % prove a subproof
 subproof(ProofLines, Available, Line, End, NewA, Premise, Concl, Next, N1, N2, D, C) :-
-    currentLineNumber(Available, Dnew),
+    nextLineNumber(Available, Dnew),
     Dnew =< D,
     % prove the subproof, the full proof is unified with S
     % TODO: maybe the anonymous variable here is already End or NewA
@@ -38,13 +38,13 @@ subproof(ProofLines, Available, Line, End, NewA, Premise, Concl, Next, N1, N2, D
     NewA = [Line|[Subproof|Available]],
     % calculate the line numbers
     nextLineNumber(Available, N1),
-    currentLineNumber([Subproof|Available], N2),
-    Next is N2 + 1.
+    currentLineNumber(NewA, Next),
+    N2 is Next - 1.
 
 % prove two subproofs
 subproofs(ProofLines1, Available1, Line, End, NewA, Premise1, Premise2,
           Concl1, Concl2, Next, N1, N2, N3, N4, D, C) :-
-    currentLineNumber(Available1, Dnew),
+    nextLineNumber(Available1, Dnew),
     Dnew =< D,
     % prove the first subproof, the full proof is unified with S1
     % TODO: maybe the anonymous variable here is already End or NewA
@@ -54,9 +54,8 @@ subproofs(ProofLines1, Available1, Line, End, NewA, Premise1, Premise2,
     % intermediate proof line lists
     ProofLines2 = [Subproof1|ProofLines1],
     Available2  = [Subproof1|Available1],
-    currentLineNumber(Available2, Dnewer),
+    nextLineNumber(Available2, Dnewer),
     Dnewer =< D,
-    % TODO: is the depth D still okay here?
     proves([Premise2], [Premise2|Available2], Concl2, S2, _, D, C),
     reverse(S2, Subproof2),
     % add the Subproof2 and Line to the previous lines to get End
@@ -189,7 +188,6 @@ proves(ProofLines, Available, Line, End, NewA, D, C) :-
     Line = line(Next, Z, disjElim, three(N0, sub(N1, N2), sub(N3, N4))),
     member(line(N0, or(X, Y), Justification, _), Available),
     Justification \= disjIntro,
-    % TODO: is this a sound line?
     ground(or(X, Y)),
     Premise1 = line(N1, X, premise, 0),
     Concl1   = line(N2, Z, _, _),
