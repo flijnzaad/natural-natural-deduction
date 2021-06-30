@@ -167,7 +167,7 @@ q30(X) :-
     provesWrap(Premises, Concl, X).
 
 q31(X) :-
-    Premises = [line(1, if(a, neg(a)), _, _)],
+    Premises = [line(1, if(a, neg(a)), premise, 0)],
     Concl    = line(_, if(a, contra), _, _),
     provesWrap(Premises, Concl, X).
 
@@ -185,4 +185,19 @@ q34(X) :-
     Premises = [line(1, if(a, neg(a)), premise, 0),
                 line(2, if(or(neg(a), b), c), premise, 0)],
     Concl    = line(_, c, _, _),
+    provesWrap(Premises, Concl, X).
+
+q35(X) :-
+    Premises = [line(1, if(neg(b), neg(a)), premise, 0)],
+    Concl    = line(_, if(a, b), _, _),
+    provesWrap(Premises, Concl, X).
+
+q36(X) :-
+    Premises = [line(1, if(a, b), premise, 0)],
+    Concl    = line(_, if(neg(b), neg(a)), _, _),
+    provesWrap(Premises, Concl, X).
+
+q37(X) :-
+    Premises = [],
+    Concl    = line(_, iff(if(neg(b), neg(a)), if(a, b)), _, _),
     provesWrap(Premises, Concl, X).
